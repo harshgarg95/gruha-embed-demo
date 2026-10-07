@@ -125,6 +125,14 @@
   // trigger button
   var btn = document.createElement('button')
   btn.className = 'g-btn'
+  // Inline styles so the trigger looks right even when mounted into the brand's LIGHT DOM
+  // (the shadow-root <style> only reaches the panel, which lives inside the shadow tree).
+  btn.style.cssText = 'all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:8px;' +
+    'background:#1f2d2b;color:#fff;font-weight:600;font-size:14px;line-height:1;padding:12px 18px;' +
+    'border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.18);' +
+    'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif'
+  btn.addEventListener('mouseenter', function () { btn.style.background = '#2a3d3a' })
+  btn.addEventListener('mouseleave', function () { btn.style.background = '#1f2d2b' })
   btn.innerHTML = '<span>🛋️</span><span>' + cfg.label + '</span>'
   if (cfg.mount && document.querySelector(cfg.mount)) {
     document.querySelector(cfg.mount).appendChild(btn)
