@@ -36,11 +36,32 @@
   }
   if (!cfg.key || !cfg.endpoint) { console.warn('[Gruha] missing data-gruha-key or data-endpoint'); return }
 
+  // Consent audit trail. Bump CONSENT_VERSION whenever the wording below changes.
+  var CONSENT_VERSION = '2026-10-09.v1'
+  var PRIVACY_URL = 'https://harshgarg95.github.io/gruha-embed-demo/privacy.html'
+  // Stable random per-browser id, used only for the per-device daily cap. Not personal data;
+  // the server stores it hashed. Clearing it is possible, which is why an IP cap backs it up.
+  function deviceId () {
+    try {
+      var k = 'gruha_did', v = localStorage.getItem(k)
+      if (!v) {
+        v = (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
+          : String(Date.now()) + Math.random().toString(36).slice(2)
+        localStorage.setItem(k, v)
+      }
+      return v
+    } catch (e) { return null }
+  }
+
   var INR = function (n) { try { return '₹' + Number(n || 0).toLocaleString('en-IN') } catch (e) { return '₹' + n } }
 
   // --- isolated root (shadow DOM) so the brand's CSS can't break us and vice-versa ---
   var host = document.createElement('div')
   host.setAttribute('data-gruha-embed', '')
+  // Theme-proofing: Shopify's Dawn (base.css) ships `div:empty { display:none }`. Our host has
+  // no LIGHT-dom children (everything lives in the shadow root), so it matches :empty and the
+  // whole widget — button and panel — silently disappears. Force a display the theme can't win.
+  host.style.setProperty('display', 'block', 'important')
   document.body.appendChild(host)
   var root = host.attachShadow({ mode: 'open' })
 
@@ -71,6 +92,11 @@
   .g-cta{all:unset;cursor:pointer;display:block;text-align:center;background:#1f2d2b;color:#fff;font-weight:700;\
     font-size:15px;padding:13px;border-radius:12px;margin-top:14px}\
   .g-cta[disabled]{opacity:.45;cursor:not-allowed}\
+  .g-consent{display:flex;gap:8px;align-items:flex-start;margin:0 0 12px;font-size:12px;color:#667;line-height:1.45;cursor:pointer}\
+  .g-drop.g-off{opacity:.5;cursor:not-allowed;border-color:#e3e7e6}\
+  .g-drop.g-off:hover{border-color:#e3e7e6;color:#667}\
+  .g-consent input{margin:2px 0 0 0;flex:0 0 auto;width:15px;height:15px;accent-color:#1f2d2b;cursor:pointer}\
+  .g-consent a{color:#1f2d2b}\
   .g-muted{font-size:12px;color:#8a938f;text-align:center;margin-top:12px}\
   .g-muted a{color:#8a938f}\
   .g-spin{text-align:center;padding:26px 10px;color:#445}\
@@ -98,7 +124,13 @@
         '<div class="g-bd">' +
           '<div class="g-prod"><img src="' + (product.image_url || '') + '" alt=""><div><div class="n"></div><div class="p"></div></div></div>' +
           '<div class="g-step g-step-upload">' +
-            '<div class="g-drop">📷 Upload a photo of your room<br><span style="font-size:12px">tap to choose or take a photo</span></div>' +
+            '<label class="g-consent"><input type="checkbox" class="g-consent-cb">' +
+              '<span>I agree to Gruha processing and storing my photo to create this preview. ' +
+              'It\'s kept private, used only to generate and show your render, and you can ask for it ' +
+              'to be deleted. <a href="' + PRIVACY_URL + '" target="_blank" rel="noopener">Privacy note</a>' +
+              '</span></label>' +
+            '<div class="g-drop g-off" aria-disabled="true">📷 Upload a photo of your room<br>' +
+              '<span style="font-size:12px">tick the box above to continue</span></div>' +
             '<input class="g-file" type="file" accept="image/*" capture="environment" style="display:none">' +
             '<img class="g-prev" alt="your room">' +
             '<button class="g-cta" disabled>Generate</button>' +
@@ -152,14 +184,32 @@
   btn.addEventListener('click', open)
   $('.g-x').addEventListener('click', close)
   ov.addEventListener('click', function (e) { if (e.target === ov) close() })
-  $('.g-drop').addEventListener('click', function () { fileInput.click() })
+  $('.g-drop').addEventListener('click', function () { if (consentCb && consentCb.checked) fileInput.click() })
   $('.g-again').addEventListener('click', function () { roomDataUrl = null; genBtn.setAttribute('disabled', ''); prev.style.display = 'none'; show('upload') })
   $('.g-retry').addEventListener('click', function () { show('upload') })
+
+  var consentCb = $('.g-consent-cb'), dropEl = $('.g-drop'), consentAt = null
+  function updateGen () {
+    if (roomDataUrl && consentCb && consentCb.checked) genBtn.removeAttribute('disabled')
+    else genBtn.setAttribute('disabled', '')
+  }
+  // DPDP: consent is an affirmative action taken BEFORE we take the photo, so it gates the
+  // picker itself. Unticked by default — never pre-tick this.
+  function updateConsent () {
+    var ok = !!(consentCb && consentCb.checked)
+    if (ok && !consentAt) consentAt = new Date().toISOString()
+    dropEl.classList.toggle('g-off', !ok)
+    dropEl.setAttribute('aria-disabled', ok ? 'false' : 'true')
+    var hint = dropEl.querySelector('span')
+    if (hint) hint.textContent = ok ? 'tap to choose or take a photo' : 'tick the box above to continue'
+    updateGen()
+  }
+  if (consentCb) consentCb.addEventListener('change', updateConsent)
 
   fileInput.addEventListener('change', function () {
     var f = fileInput.files && fileInput.files[0]; if (!f) return
     var r = new FileReader()
-    r.onload = function () { roomDataUrl = r.result; prev.src = roomDataUrl; prev.style.display = 'block'; genBtn.removeAttribute('disabled') }
+    r.onload = function () { roomDataUrl = r.result; prev.src = roomDataUrl; prev.style.display = 'block'; updateGen() }
     r.readAsDataURL(f)
   })
 
@@ -170,7 +220,11 @@
     if (cfg.apikey) { headers['apikey'] = cfg.apikey; headers['Authorization'] = 'Bearer ' + cfg.apikey }
     fetch(cfg.endpoint, {
       method: 'POST', headers: headers,
-      body: JSON.stringify({ key: cfg.key, roomImage: roomDataUrl, product: product }),
+      body: JSON.stringify({
+        key: cfg.key, roomImage: roomDataUrl, product: product,
+        consent: { version: CONSENT_VERSION, at: consentAt },
+        deviceId: deviceId(),
+      }),
     })
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j } }) })
       .then(function (res) {
