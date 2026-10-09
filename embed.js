@@ -206,11 +206,60 @@
   }
   if (consentCb) consentCb.addEventListener('change', updateConsent)
 
+  var photoMeta = null
+  // Prepare the upload in the browser: measure quality on the ORIGINAL pixels (faithful, and it
+  // keeps heavy decoding off the edge function), then downscale so the payload — and the stored
+  // copy — land in the 200-400 KB band. Also cuts what we send to Gemini.
+  function prepPhoto (file, cb) {
+    var fr = new FileReader()
+    fr.onload = function () {
+      var img = new Image()
+      img.onload = function () {
+        var ow = img.naturalWidth, oh = img.naturalHeight
+        var m = { w: ow, h: oh, bytes: file.size, brightness: null, sharpness: null }
+        try {
+          // small grayscale sample of the original
+          var S = 192, sc = Math.min(S / ow, S / oh, 1)
+          var mw = Math.max(8, Math.round(ow * sc)), mh = Math.max(8, Math.round(oh * sc))
+          var mc = document.createElement('canvas'); mc.width = mw; mc.height = mh
+          var mx = mc.getContext('2d'); mx.drawImage(img, 0, 0, mw, mh)
+          var d = mx.getImageData(0, 0, mw, mh).data
+          var g = new Float32Array(mw * mh), sum = 0
+          for (var i = 0, q = 0; i < d.length; i += 4, q++) {
+            var y = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]
+            g[q] = y; sum += y
+          }
+          m.brightness = Math.round((sum / g.length) * 10) / 10          // 0..255 mean luma
+          var lsum = 0, lsq = 0, n = 0                                    // variance of Laplacian
+          for (var yy = 1; yy < mh - 1; yy++) {
+            for (var xx = 1; xx < mw - 1; xx++) {
+              var k = yy * mw + xx
+              var L = 4 * g[k] - g[k - 1] - g[k + 1] - g[k - mw] - g[k + mw]
+              lsum += L; lsq += L * L; n++
+            }
+          }
+          if (n) { var mu = lsum / n; m.sharpness = Math.round(((lsq / n) - mu * mu) * 10) / 10 }
+        } catch (e) { /* metrics are best-effort; never block the upload */ }
+        var MAX = 1440, s2 = Math.min(MAX / ow, MAX / oh, 1)
+        var c = document.createElement('canvas')
+        c.width = Math.max(1, Math.round(ow * s2)); c.height = Math.max(1, Math.round(oh * s2))
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height)
+        var out
+        try { out = c.toDataURL('image/jpeg', 0.82) } catch (e) { out = fr.result }
+        cb(out, m)
+      }
+      img.onerror = function () { cb(fr.result, null) }
+      img.src = fr.result
+    }
+    fr.readAsDataURL(file)
+  }
+
   fileInput.addEventListener('change', function () {
     var f = fileInput.files && fileInput.files[0]; if (!f) return
-    var r = new FileReader()
-    r.onload = function () { roomDataUrl = r.result; prev.src = roomDataUrl; prev.style.display = 'block'; updateGen() }
-    r.readAsDataURL(f)
+    prepPhoto(f, function (dataUrl, meta) {
+      roomDataUrl = dataUrl; photoMeta = meta
+      prev.src = dataUrl; prev.style.display = 'block'; updateGen()
+    })
   })
 
   genBtn.addEventListener('click', function () {
@@ -224,6 +273,7 @@
         key: cfg.key, roomImage: roomDataUrl, product: product,
         consent: { version: CONSENT_VERSION, at: consentAt },
         deviceId: deviceId(),
+        photo: photoMeta,
       }),
     })
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j } }) })
