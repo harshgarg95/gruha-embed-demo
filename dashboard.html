@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Gruha — Usage dashboard</title>
+<style>
+  :root{--ink:#241f1b;--muted:#7a736b;--line:#e9e4dc;--bg:#faf7f2;--ok:#1f7a4d;--bad:#b4231b;--gold:#b08642}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:1040px;margin:0 auto;padding:34px 22px 80px}
+  h1{font-size:23px;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 24px}
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:760px){.cards{grid-template-columns:repeat(2,1fr)}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px 16px}
+  .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .v{font-size:25px;font-weight:800;margin-top:5px}
+  .v small{font-size:13px;color:var(--muted);font-weight:600}
+  .bar{height:9px;background:#eee8e0;border-radius:99px;overflow:hidden;margin-top:10px}
+  .bar i{display:block;height:100%;background:var(--gold)}
+  h2{font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:30px 0 10px}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}
+  .chart{display:flex;align-items:flex-end;gap:5px;height:140px}
+  .chart .col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:2px;min-width:0}
+  .chart .d{background:#2c3b38;border-radius:3px 3px 0 0}
+  .chart .f{background:#e0b4b0;border-radius:3px 3px 0 0}
+  .chart .lbl{font-size:9px;color:var(--muted);text-align:center;margin-top:5px;white-space:nowrap;overflow:hidden}
+  .prod{display:flex;align-items:center;gap:10px;margin:7px 0;font-size:14px}
+  .prod .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .prod .pb{width:46%;height:8px;background:#eee8e0;border-radius:99px;overflow:hidden}
+  .prod .pb i{display:block;height:100%;background:#2c3b38}
+  .prod .c{width:28px;text-align:right;font-weight:700;font-size:13px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .r{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+  .r img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#f1ece4}
+  .r .ph{width:100%;aspect-ratio:4/3;background:#f1ece4;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:11px}
+  .r .m{padding:8px 10px;font-size:12px}
+  .r .m b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .r .m span{color:var(--muted)}
+  .pill{display:inline-block;font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;margin-top:3px}
+  .pill.ok{background:#e6f3ec;color:var(--ok)}
+  .pill.bad{background:#fdeceb;color:var(--bad)}
+  .btn{display:inline-block;background:var(--ink);color:#fff;text-decoration:none;font-weight:700;font-size:13px;padding:9px 15px;border-radius:9px}
+  .err{background:#fdeceb;color:var(--bad);padding:14px 16px;border-radius:12px;font-size:14px}
+  .muted{color:var(--muted);font-size:13px}
+</style></head><body><div class="wrap" id="app">
+  <p class="muted">Loading…</p>
+</div>
+<script>
+(function () {
+  var API = 'https://txkxblempgconaeplqde.supabase.co/functions/v1/embed-dashboard'
+  var token = new URLSearchParams(location.search).get('token')
+  var app = document.getElementById('app')
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+    return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] }) }
+  if (!token) { app.innerHTML = '<div class="err">This link is missing its token.</div>'; return }
+
+  fetch(API + '?token=' + encodeURIComponent(token))
+    .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j } }) })
+    .then(function (res) {
+      if (!res.ok) throw new Error(res.j.error || 'Could not load this dashboard.')
+      var d = res.j, u = d.usage, pct = u.utilisation_pct == null ? 0 : u.utilisation_pct
+      var maxDay = Math.max.apply(null, d.daily.map(function (x) { return x.done + x.failed }).concat([1]))
+      var maxProd = Math.max.apply(null, d.topProducts.map(function (x) { return x.count }).concat([1]))
+      var fmt = function (s) { return s ? new Date(s).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : '—' }
+
+      app.innerHTML =
+        '<h1>' + esc(d.brand) + ' — “See it in your room”</h1>' +
+        '<p class="sub">Billing period ' + fmt(d.period.start) + ' → ' + fmt(d.period.end) + '</p>' +
+        '<div class="cards">' +
+          '<div class="card"><div class="k">Renders this period</div><div class="v">' + u.used +
+            ' <small>/ ' + u.limit + '</small></div><div class="bar"><i style="width:' + Math.min(pct, 100) + '%"></i></div></div>' +
+          '<div class="card"><div class="k">Utilisation</div><div class="v">' + pct + '<small>%</small></div></div>' +
+          '<div class="card"><div class="k">Successful</div><div class="v">' + d.totals.done + '</div></div>' +
+          '<div class="card"><div class="k">Failed <small>(not billed)</small></div><div class="v">' + d.totals.failed + '</div></div>' +
+        '</div>' +
+        '<h2>Daily usage</h2><div class="panel">' + (d.daily.length ?
+          '<div class="chart">' + d.daily.map(function (x) {
+            var hD = Math.round((x.done / maxDay) * 120), hF = Math.round((x.failed / maxDay) * 120)
+            return '<div class="col" title="' + x.date + ': ' + x.done + ' ok, ' + x.failed + ' failed">' +
+              '<div class="f" style="height:' + hF + 'px"></div><div class="d" style="height:' + hD + 'px"></div>' +
+              '<div class="lbl">' + x.date.slice(8) + '</div></div>' }).join('') + '</div>'
+          : '<p class="muted">No renders yet this period.</p>') + '</div>' +
+        '<h2>Top products</h2><div class="panel">' + (d.topProducts.length ?
+          d.topProducts.map(function (p) {
+            return '<div class="prod"><div class="n">' + esc(p.name) + '</div>' +
+              '<div class="pb"><i style="width:' + Math.round((p.count / maxProd) * 100) + '%"></i></div>' +
+              '<div class="c">' + p.count + '</div></div>' }).join('')
+          : '<p class="muted">No successful renders yet.</p>') + '</div>' +
+        '<h2>Recent renders</h2><div class="grid">' + (d.recent.length ? d.recent.map(function (r) {
+            return '<div class="r">' + (r.thumb ? '<img src="' + esc(r.thumb) + '" alt="">'
+                : '<div class="ph">no image stored</div>') +
+              '<div class="m"><b>' + esc(r.product || '—') + '</b>' +
+              '<span>' + new Date(r.at).toLocaleString() + '</span><br>' +
+              (r.status === 'done' ? '<span class="pill ok">rendered</span>'
+                : '<span class="pill bad">failed · not billed</span>') +
+              '</div></div>' }).join('') : '<p class="muted">Nothing yet.</p>') + '</div>' +
+        '<h2>Export</h2><div class="panel"><a class="btn" href="' + API + '?format=csv&token=' +
+          encodeURIComponent(token) + '">Download CSV</a> ' +
+          '<span class="muted" style="margin-left:10px">This period’s renders.</span></div>'
+    })
+    .catch(function (e) { app.innerHTML = '<div class="err">' + esc(e.message) + '</div>' })
+})()
+</script></body></html>
