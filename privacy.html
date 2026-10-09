@@ -14,38 +14,55 @@
   h2{font-size:16px;margin:28px 0 6px}
   p,li{font-size:15px;color:#3b3630}
   ul{padding-left:20px}
+  table{border-collapse:collapse;width:100%;margin-top:10px;font-size:14px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-weight:700;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
   .box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-top:22px}
+  a{color:#1f2d2b}
   .foot{color:var(--muted);font-size:13px;margin-top:34px;border-top:1px solid var(--line);padding-top:16px}
 </style></head><body><div class="wrap">
   <h1>Privacy note — “See it in your room”</h1>
   <p class="sub">How Gruha handles the photo you upload. Consent version 2026-10-09.v1</p>
 
-  <h2>What we take</h2>
-  <p>Only the room photo you choose to upload, and the preview image we generate from it. We don’t
-     ask for your name, email or address to make a preview.</p>
+  <h2>What we store</h2>
+  <p>Only the room photo you choose to upload, and the preview image we generate from it. We do
+     not ask for your name, address or payment details to make a preview.</p>
 
-  <h2>What we do with it</h2>
-  <p>Your photo is sent to our AI partner, <strong>Google Gemini</strong>, purely to generate the
-     preview showing the product in your room. That is the only purpose.</p>
+  <h2>Who processes it</h2>
+  <p>Your photo is sent to our AI partner, <strong>Google Gemini</strong>, solely to generate the
+     preview showing the product in your room. That is the only purpose it is used for.</p>
+
+  <h2>How long we keep it</h2>
+  <div class="box" style="margin-top:8px">
+    <table>
+      <tr><th>What</th><th>Kept for</th><th>Why</th></tr>
+      <tr><td><strong>Your room photo and the generated preview</strong></td>
+          <td><strong>90 days</strong>, then automatically deleted</td>
+          <td>So the shop can show you the result and we can investigate problems</td></tr>
+      <tr><td>A usage record (date, product, whether the render succeeded) — <strong>no image</strong></td>
+          <td>Kept indefinitely</td>
+          <td>It is the shop’s billing and usage record</td></tr>
+    </table>
+    <p style="margin:12px 0 0;font-size:14px;color:#6f675f">Deletion at 90 days runs automatically
+       every day — it is enforced by a scheduled job, not just a promise. After it runs, the usage
+       record remains but the images are gone.</p>
+  </div>
 
   <h2>What we do NOT do</h2>
   <ul>
     <li>We do <strong>not</strong> use your photo for marketing.</li>
-    <li>We do <strong>not</strong> sell or share it with anyone other than the AI partner above.</li>
-    <li>We do <strong>not</strong> publish it — stored images are private and never publicly accessible.</li>
+    <li>We do <strong>not</strong> use it to train AI models.</li>
+    <li>We do <strong>not</strong> sell or share it with anyone besides the AI partner above.</li>
+    <li>Stored images are private — never publicly accessible, and only ever served over
+        short-lived signed links to the shop that generated them.</li>
   </ul>
 
-  <div class="box">
-    <h2 style="margin-top:0">How long we keep it</h2>
-    <p style="margin-bottom:0">Your uploaded photo and the generated preview are stored privately for up to
-       <strong>90 days</strong>, so the shop can show you the result and we can investigate problems.
-       After that they are deleted. You can ask us to delete them sooner.</p>
-  </div>
-
   <h2>Your choices</h2>
-  <p>Ticking the consent box is entirely up to you — nothing is uploaded until you do, and you can
-     close the panel at any point. To ask for your images to be deleted, contact the shop you used
-     this on and reference the date and product; they can reach Gruha to action it.</p>
+  <p>Consent is entirely up to you: nothing is uploaded until you tick the box, and you can close
+     the panel at any time. To ask for your images to be deleted sooner, email us at
+     <a href="mailto:hello.gruhalabs@gmail.com"><strong>hello.gruhalabs@gmail.com</strong></a> —
+     tell us roughly when you used it and which shop, and we will remove them.</p>
 
-  <p class="foot">Gruha · “See it in your room”. This note covers the preview widget only.</p>
+  <p class="foot">Gruha · “See it in your room”. This note covers the preview widget only.
+     Contact: <a href="mailto:hello.gruhalabs@gmail.com">hello.gruhalabs@gmail.com</a></p>
 </div></body></html>

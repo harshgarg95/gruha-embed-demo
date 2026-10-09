@@ -53,7 +53,15 @@
     } catch (e) { return null }
   }
 
-  var INR = function (n) { try { return '₹' + Number(n || 0).toLocaleString('en-IN') } catch (e) { return '₹' + n } }
+  // Currency comes from the store (Shopify passes its ISO code); ₹ is only the fallback.
+  var CURRENCY = String(script.getAttribute('data-currency') ||
+    (window.GruhaEmbed && window.GruhaEmbed.currency) || 'INR').toUpperCase()
+  var LOCALE = script.getAttribute('data-locale') || (CURRENCY === 'INR' ? 'en-IN' : undefined)
+  var money = function (n) {
+    var v = Number(n || 0)
+    try { return new Intl.NumberFormat(LOCALE, { style: 'currency', currency: CURRENCY }).format(v) }
+    catch (e) { return CURRENCY + ' ' + v }
+  }
 
   // --- isolated root (shadow DOM) so the brand's CSS can't break us and vice-versa ---
   var host = document.createElement('div')
@@ -151,7 +159,7 @@
 
   var $ = function (s) { return root.querySelector(s) }
   $('.g-prod .n').textContent = product.name
-  $('.g-prod .p').textContent = INR(product.price_inr)
+  $('.g-prod .p').textContent = money(product.price_inr)
   if (!product.image_url) $('.g-prod img').style.display = 'none'
 
   // trigger button
@@ -179,7 +187,22 @@
       $('.g-step-' + s).style.display = s === step ? 'block' : 'none'
     })
   }
-  function open() { ov.classList.add('open'); show('upload') }
+  // White-label is a per-brand paid switch, so the widget asks the server (the brand cannot
+  // simply strip the badge from the snippet). Fails open = badge stays.
+  var brandCfgRequested = false
+  function applyBrandConfig () {
+    if (brandCfgRequested) return
+    brandCfgRequested = true
+    try {
+      fetch(cfg.endpoint + '?config=1&key=' + encodeURIComponent(cfg.key))
+        .then(function (r) { return r.json() })
+        .then(function (c) {
+          if (c && c.white_label) { var m = $('.g-muted'); if (m) m.style.display = 'none' }
+        })
+        .catch(function () {})
+    } catch (e) {}
+  }
+  function open() { ov.classList.add('open'); show('upload'); applyBrandConfig() }
   function close() { ov.classList.remove('open') }
   btn.addEventListener('click', open)
   $('.g-x').addEventListener('click', close)
@@ -274,6 +297,7 @@
         consent: { version: CONSENT_VERSION, at: consentAt },
         deviceId: deviceId(),
         photo: photoMeta,
+        currency: CURRENCY,
       }),
     })
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j } }) })
@@ -291,9 +315,9 @@
     var q = j.quote || { items: [], total_inr: product.price_inr }
     var html = ''
     ;(q.items || []).forEach(function (it) {
-      html += '<div class="g-row"><span>' + it.name + ' × ' + it.qty + '</span><span>' + INR(it.line_inr) + '</span></div>'
+      html += '<div class="g-row"><span>' + it.name + ' × ' + it.qty + '</span><span>' + money(it.line_inr) + '</span></div>'
     })
-    html += '<div class="g-tot"><span>Total</span><span>' + INR(q.total_inr) + '</span></div>'
+    html += '<div class="g-tot"><span>Total</span><span>' + money(q.total_inr) + '</span></div>'
     $('.g-quote').innerHTML = html
     var buy = $('.g-buy')
     if (j.buy_link) { buy.href = j.buy_link; buy.style.display = '' } else { buy.style.display = 'none' }
@@ -302,7 +326,7 @@
 
   // WhatsApp: share the actual render image where the browser supports it (mobile), else a text link.
   $('.g-wa').addEventListener('click', function () {
-    var msg = 'Check out the ' + product.name + ' in my room — ' + INR(product.price_inr) + (product.buy_link ? ('  ' + product.buy_link) : '')
+    var msg = 'Check out the ' + product.name + ' in my room — ' + money(product.price_inr) + (product.buy_link ? ('  ' + product.buy_link) : '')
     function fallback() { window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank') }
     try {
       if (navigator.canShare && lastRenderUrl) {
