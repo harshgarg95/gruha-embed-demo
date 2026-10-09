@@ -87,7 +87,10 @@
               '<div class="pb"><i style="width:' + Math.round((p.count / maxProd) * 100) + '%"></i></div>' +
               '<div class="c">' + p.count + '</div></div>' }).join('')
           : '<p class="muted">No successful renders yet.</p>') + '</div>' +
-        '<h2>Recent renders</h2><div class="grid">' + (d.recent.length ? d.recent.map(function (r) {
+        '<h2>Recent renders</h2>' +
+        (d.recentHiddenNoImage ? '<p class="muted" style="margin:-4px 0 10px">' + d.recentHiddenNoImage +
+          ' earlier render(s) pre-date image archiving, so they have no preview. They are still counted above and in the CSV.</p>' : '') +
+        '<div class="grid">' + (d.recent.length ? d.recent.map(function (r) {
             return '<div class="r">' + (r.thumb ? '<img src="' + esc(r.thumb) + '" alt="">'
                 : '<div class="ph">no image stored</div>') +
               '<div class="m"><b>' + esc(r.product || '—') + '</b>' +
