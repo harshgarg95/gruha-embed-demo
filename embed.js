@@ -111,6 +111,16 @@
   .g-addlook{all:unset;cursor:pointer;display:block;text-align:center;font-size:13px;font-weight:600;color:#1f2d2b;\
     border:1px solid #d8dedc;border-radius:10px;padding:9px;margin:0 0 12px}\
   .g-addlook:hover{background:#f3f6f5}\
+  .g-rooms{margin-top:12px}\
+  .g-rooms-t{font-size:12px;color:#8a938f;margin-bottom:6px}\
+  .g-rooms-s{display:flex;gap:7px;overflow-x:auto;padding-bottom:2px}\
+  .g-rooms-s img{width:62px;height:48px;object-fit:cover;border-radius:8px;cursor:pointer;\
+    border:2px solid transparent;flex:0 0 auto;background:#f1ece4}\
+  .g-rooms-s img.sel{border-color:#1f2d2b}\
+  .g-saved{margin-top:10px}\
+  .g-chip{all:unset;cursor:pointer;display:inline-block;font-size:12px;color:#1f2d2b;background:#f0f3f2;\
+    border-radius:999px;padding:6px 11px;margin:0 6px 6px 0}\
+  .g-chip:hover{background:#e3e9e7}\
   .g-muted{font-size:12px;color:#8a938f;text-align:center;margin-top:12px}\
   .g-muted a{color:#8a938f}\
   .g-spin{text-align:center;padding:26px 10px;color:#445}\
@@ -148,6 +158,7 @@
               '<span style="font-size:12px">tick the box above to continue</span></div>' +
             '<input class="g-file" type="file" accept="image/*" capture="environment" style="display:none">' +
             '<img class="g-prev" alt="your room">' +
+            '<div class="g-rooms" style="display:none"></div>' +
             '<button class="g-cta" disabled>Generate</button>' +
           '</div>' +
           '<div class="g-step g-step-load" style="display:none"><div class="g-spin"><div class="g-dot"></div><div>Staging your room… about 15 seconds</div></div></div>' +
@@ -224,9 +235,9 @@
   $('.g-again').addEventListener('click', function () { roomDataUrl = null; genBtn.setAttribute('disabled', ''); prev.style.display = 'none'; show('upload') })
   $('.g-retry').addEventListener('click', function () { show('upload') })
 
-  var consentCb = $('.g-consent-cb'), dropEl = $('.g-drop'), consentAt = null
+  var consentCb = $('.g-consent-cb'), dropEl = $('.g-drop'), consentAt = null, roomKeyPicked = null
   function updateGen () {
-    if (roomDataUrl && consentCb && consentCb.checked) genBtn.removeAttribute('disabled')
+    if ((roomDataUrl || roomKeyPicked) && consentCb && consentCb.checked) genBtn.removeAttribute('disabled')
     else genBtn.setAttribute('disabled', '')
   }
   // DPDP: consent is an affirmative action taken BEFORE we take the photo, so it gates the
@@ -238,6 +249,12 @@
     dropEl.setAttribute('aria-disabled', ok ? 'false' : 'true')
     var hint = dropEl.querySelector('span')
     if (hint) hint.textContent = ok ? 'tap to choose or take a photo' : 'tick the box above to continue'
+    // Reusing a stored room is still processing it, so saved rooms appear only after consent.
+    if (ok) paintRooms($('.g-rooms'), function (r) {
+      roomKeyPicked = r.key; roomDataUrl = null
+      prev.src = r.url; prev.style.display = 'block'; updateGen()
+    })
+    else $('.g-rooms').style.display = 'none'
     updateGen()
   }
   if (consentCb) consentCb.addEventListener('change', updateConsent)
@@ -293,23 +310,26 @@
   fileInput.addEventListener('change', function () {
     var f = fileInput.files && fileInput.files[0]; if (!f) return
     prepPhoto(f, function (dataUrl, meta) {
-      roomDataUrl = dataUrl; photoMeta = meta
+      roomDataUrl = dataUrl; photoMeta = meta; roomKeyPicked = null   // a fresh upload wins
       prev.src = dataUrl; prev.style.display = 'block'; updateGen()
     })
   })
 
   genBtn.addEventListener('click', function () {
-    if (!roomDataUrl) return
+    if (!roomDataUrl && !roomKeyPicked) return
+    roomsCache = null                                  // a new render adds a room; refresh next time
     show('load')
     var headers = { 'Content-Type': 'application/json' }
     if (cfg.apikey) { headers['apikey'] = cfg.apikey; headers['Authorization'] = 'Bearer ' + cfg.apikey }
     fetch(cfg.endpoint, {
       method: 'POST', headers: headers,
       body: JSON.stringify({
-        key: cfg.key, roomImage: roomDataUrl, product: product,
+        key: cfg.key, product: product,
+        roomImage: roomKeyPicked ? null : roomDataUrl,
+        roomKey: roomKeyPicked || null,
         consent: { version: CONSENT_VERSION, at: consentAt },
         deviceId: deviceId(),
-        photo: photoMeta,
+        photo: roomKeyPicked ? null : photoMeta,   // metrics describe a NEW upload only
         currency: CURRENCY,
       }),
     })
@@ -335,6 +355,41 @@
     var buy = $('.g-buy')
     if (j.buy_link) { buy.href = j.buy_link; buy.style.display = '' } else { buy.style.display = 'none' }
     show('res')
+  }
+
+  // ---------------------------------------------------------------- Saved rooms
+  // A shopper's saved rooms are just the input photos already archived from their past renders,
+  // scoped server-side to this brand + this device. Nothing extra is stored, and when the
+  // 90-day purge clears those images the list empties by itself.
+  var roomsCache = null
+  function fetchRooms () {
+    if (roomsCache) return roomsCache
+    var d = deviceId()
+    if (!d) { roomsCache = Promise.resolve([]); return roomsCache }
+    try {
+      roomsCache = fetch(cfg.endpoint + '?rooms=1&key=' + encodeURIComponent(cfg.key) +
+        '&device=' + encodeURIComponent(d))
+        .then(function (r) { return r.json() })
+        .then(function (j) { return (j && j.rooms) || [] })
+        .catch(function () { return [] })
+    } catch (e) { roomsCache = Promise.resolve([]) }
+    return roomsCache
+  }
+  function paintRooms (box, onPick) {
+    fetchRooms().then(function (rooms) {
+      if (!rooms.length) { box.style.display = 'none'; return }
+      box.style.display = 'block'
+      box.innerHTML = '<div class="g-rooms-t">or reuse a room you used before</div><div class="g-rooms-s">' +
+        rooms.map(function (r, i) { return '<img data-i="' + i + '" src="' + r.url + '" alt="saved room">' }).join('') +
+        '</div>'
+      Array.prototype.forEach.call(box.querySelectorAll('img'), function (im) {
+        im.addEventListener('click', function () {
+          Array.prototype.forEach.call(box.querySelectorAll('img'), function (x) { x.classList.remove('sel') })
+          im.classList.add('sel')
+          onPick(rooms[Number(im.getAttribute('data-i'))])
+        })
+      })
+    })
   }
 
   // ---------------------------------------------------------------- Your Look (multi-product)
@@ -404,6 +459,7 @@
         '<h3>Your Look</h3><button class="g-x l-close" aria-label="Close">×</button></div>' +
         '<div class="g-bd">' +
           '<div class="l-items"></div>' +
+          '<div class="g-saved l-saved"></div>' +
           '<div class="l-seg"><button class="l-furn" aria-pressed="true">My room has furniture</button>' +
             '<button class="l-empty" aria-pressed="false">My room is empty</button></div>' +
           '<div class="l-warn" style="display:none"></div>' +
@@ -418,6 +474,7 @@
               '<span style="font-size:12px">tick the box above to continue</span></div>' +
             '<input class="l-file" type="file" accept="image/*" capture="environment" style="display:none">' +
             '<img class="g-prev l-prev" alt="your room">' +
+            '<div class="g-rooms l-rooms" style="display:none"></div>' +
             '<button class="g-cta l-go" disabled>See my look</button>' +
           '</div>' +
           '<div class="g-step l-step-load" style="display:none"><div class="g-spin"><div class="g-dot"></div>' +
@@ -435,6 +492,32 @@
     var pill = L('.l-pill'), lov = L('.l-ov'), lfile = L('.l-file'), lprev = L('.l-prev')
     var lgo = L('.l-go'), lcb = L('.l-consent-cb'), ldrop = L('.l-drop')
     var roomType = 'furnished', lroom = null, lmeta = null, lconsentAt = null, lastLook = null
+    var lroomKey = null
+    // Saved looks are product references only — no images — so they carry no retention burden.
+    var SAVED_KEY = 'gruha_looks_saved_' + cfg.key
+    function savedGet () { try { return JSON.parse(localStorage.getItem(SAVED_KEY) || '[]') } catch (e) { return [] } }
+    function savedSet (a) { try { localStorage.setItem(SAVED_KEY, JSON.stringify(a.slice(0, 10))) } catch (e) {} }
+    function renderSaved () {
+      var box = L('.l-saved'), saved = savedGet(), cur = lookGet()
+      box.innerHTML =
+        (cur.length ? '<button class="g-chip l-save">💾 Save this look</button>' : '') +
+        saved.map(function (x, i) {
+          return '<button class="g-chip l-open" data-i="' + i + '">' + x.name + '</button>' }).join('')
+      var sb = L('.l-save')
+      if (sb) sb.addEventListener('click', function () {
+        var a = savedGet()
+        a.unshift({ name: cur.length + ' items · ' + new Date().toLocaleDateString(undefined, { day: 'numeric', month: 'short' }),
+                    items: cur, at: new Date().toISOString() })
+        savedSet(a); renderSaved()
+        sb.textContent = '✓ Saved'
+      })
+      Array.prototype.forEach.call(lr.querySelectorAll('.l-open'), function (b) {
+        b.addEventListener('click', function () {
+          var x = savedGet()[Number(b.getAttribute('data-i'))]
+          if (x && x.items) { lookSet(x.items); refresh() }
+        })
+      })
+    }
 
     function cap () { return roomType === 'empty' ? CAP_EMPTY : CAP_FURNISHED }
     function lshow (st) {
@@ -466,7 +549,7 @@
     window.__gruhaLookRefresh = refresh
 
     function updL () {
-      if (lroom && lcb.checked) lgo.removeAttribute('disabled'); else lgo.setAttribute('disabled', '')
+      if ((lroom || lroomKey) && lcb.checked) lgo.removeAttribute('disabled'); else lgo.setAttribute('disabled', '')
     }
     lcb.addEventListener('change', function () {
       var ok = lcb.checked
@@ -475,19 +558,26 @@
       ldrop.setAttribute('aria-disabled', ok ? 'false' : 'true')
       var h = ldrop.querySelector('span')
       if (h) h.textContent = ok ? 'tap to choose or take a photo' : 'tick the box above to continue'
+      if (ok) paintRooms(L('.l-rooms'), function (r) {
+        lroomKey = r.key; lroom = null
+        lprev.src = r.url; lprev.style.display = 'block'; updL()
+      })
+      else L('.l-rooms').style.display = 'none'
       updL()
     })
     ldrop.addEventListener('click', function () { if (lcb.checked) lfile.click() })
     lfile.addEventListener('change', function () {
       var f = lfile.files && lfile.files[0]; if (!f) return
-      prepPhoto(f, function (d, m) { lroom = d; lmeta = m; lprev.src = d; lprev.style.display = 'block'; updL() })
+      prepPhoto(f, function (d, m) { lroom = d; lmeta = m; lroomKey = null; lprev.src = d; lprev.style.display = 'block'; updL() })
     })
-    pill.addEventListener('click', function () { refresh(); lov.classList.add('open'); lshow('upload'); applyBrandConfigTo(L) })
+    pill.addEventListener('click', function () {
+      roomsCache = null; refresh(); renderSaved(); lov.classList.add('open'); lshow('upload'); applyBrandConfigTo(L)
+    })
     L('.l-close').addEventListener('click', function () { lov.classList.remove('open') })
     lov.addEventListener('click', function (e) { if (e.target === lov) lov.classList.remove('open') })
     L('.l-more').addEventListener('click', function () { lov.classList.remove('open') })
     L('.l-retry').addEventListener('click', function () { lshow('upload') })
-    L('.l-again').addEventListener('click', function () { lroom = null; lprev.style.display = 'none'; updL(); lshow('upload') })
+    L('.l-again').addEventListener('click', function () { lroom = null; lroomKey = null; lprev.style.display = 'none'; updL(); lshow('upload') })
     ;[['furn', 'furnished'], ['empty', 'empty']].forEach(function (pair) {
       L('.l-' + pair[0]).addEventListener('click', function () {
         roomType = pair[1]
@@ -499,7 +589,7 @@
 
     lgo.addEventListener('click', function () {
       var all = lookGet(), items = all.slice(0, cap())
-      if (!items.length || !lroom) return
+      if (!items.length || (!lroom && !lroomKey)) return
       lshow('load')
       // SEQUENTIAL: one product per pass, each pass feeding the previous render forward. This is
       // what our testing showed keeps the room locked and each product recognisable; a single
@@ -514,9 +604,11 @@
         fetch(cfg.endpoint, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            key: cfg.key, roomImage: current, product: it, currency: CURRENCY,
+            key: cfg.key, product: it, currency: CURRENCY,
+            roomImage: (i === 0 && lroomKey) ? null : current,   // pass 1 may be a SAVED room
+            roomKey: (i === 0 && lroomKey) ? lroomKey : null,
             consent: { version: CONSENT_VERSION, at: lconsentAt }, deviceId: deviceId(),
-            photo: i === 0 ? lmeta : null,                       // only pass 1 is a real shopper photo
+            photo: (i === 0 && !lroomKey) ? lmeta : null,        // metrics describe a NEW upload only
             look: lookId ? { id: lookId, index: i + 1, size: items.length } : null,
           }),
         }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j } }) })
@@ -560,7 +652,7 @@
       } catch (e) { fb() }
     })
 
-    refresh()
+    refresh(); renderSaved()
   }
 
   // WhatsApp: share the actual render image where the browser supports it (mobile), else a text link.
