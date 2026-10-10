@@ -131,6 +131,10 @@
   .g-chip:hover{background:#e3e9e7}\
   .g-chip.on{background:#1f2d2b;color:#fff}\
   .g-vars{margin-top:12px}\
+  .g-hand{margin-top:12px;text-align:center}\
+  .g-qr{background:#fff;border:1px solid #e9e4dc;border-radius:12px;padding:10px;display:inline-block;margin:6px 0}\
+  .g-qr svg{width:148px;height:148px;display:block}\
+  .g-hand-s{font-size:12px;color:#8a938f}\
   .g-muted{font-size:12px;color:#8a938f;text-align:center;margin-top:12px}\
   .g-muted a{color:#8a938f}\
   .g-spin{text-align:center;padding:26px 10px;color:#445}\
@@ -169,6 +173,8 @@
             '<input class="g-file" type="file" accept="image/*" capture="environment" style="display:none">' +
             '<img class="g-prev" alt="your room">' +
             '<div class="g-rooms" style="display:none"></div>' +
+            '<button class="g-link g-phone" style="display:none">📱 Continue on your phone</button>' +
+            '<div class="g-hand" style="display:none"></div>' +
             '<button class="g-cta" disabled>Generate</button>' +
           '</div>' +
           '<div class="g-step g-step-load" style="display:none"><div class="g-spin"><div class="g-dot"></div><div>Staging your room… about 15 seconds</div></div></div>' +
@@ -237,7 +243,10 @@
     })
   }
   function applyBrandConfig () { applyBrandConfigTo($) }
-  function open() { ov.classList.add('open'); show('upload'); applyBrandConfig() }
+  function open() {
+    ov.classList.add('open'); show('upload'); applyBrandConfig()
+    if (isDesktop()) $('.g-phone').style.display = 'inline-block'
+  }
   function close() { ov.classList.remove('open') }
   btn.addEventListener('click', open)
   $('.g-x').addEventListener('click', close)
@@ -359,6 +368,19 @@
     postRender(product)
   })
 
+  $('.g-phone').addEventListener('click', function () {
+    startHandoff({ key: cfg.key, currency: CURRENCY, items: [product] }, $, function (imgUrl) {
+      $('.g-res img').src = imgUrl
+      $('.g-quote').innerHTML = '<div class="g-row"><span>' + product.name + ' × 1</span><span>' +
+        money(product.price_inr) + '</span></div><div class="g-tot"><span>Total</span><span>' +
+        money(product.price_inr) + '</span></div>'
+      var buy = $('.g-buy')
+      if (product.buy_link) { buy.href = product.buy_link; buy.style.display = '' } else { buy.style.display = 'none' }
+      $('.g-vars').style.display = 'none'
+      show('res')
+    })
+  })
+
   var lastRenderUrl = null
   function renderResult(j, shown) {
     lastRenderUrl = j.renderDataUrl
@@ -405,6 +427,57 @@
         })
       })
     })
+  }
+
+  // ---------------------------------------------------------------- Desktop -> phone hand-off
+  // A desktop shopper has no camera pointing at their room. We open a short-lived session, show
+  // a QR, and poll it; the phone shoots the room, renders, and writes the result back here.
+  var HANDOFF_URL = script.getAttribute('data-handoff') ||
+    'https://harshgarg95.github.io/gruha-embed-demo/handoff.html'
+  function isDesktop () {
+    try { return !window.matchMedia('(pointer: coarse)').matches } catch (e) { return true }
+  }
+  function loadQrLib () {
+    if (window.qrcode) return Promise.resolve(window.qrcode)
+    return new Promise(function (res, rej) {
+      var sc = document.createElement('script')
+      sc.src = 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js'
+      sc.onload = function () { res(window.qrcode) }
+      sc.onerror = rej
+      document.head.appendChild(sc)
+    })
+  }
+  function startHandoff (payload, sel, onResult) {
+    var box = sel('.g-hand')
+    box.style.display = 'block'
+    box.innerHTML = '<div class="g-hand-s">starting…</div>'
+    fetch(cfg.endpoint + '?session=new', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: cfg.key, payload: payload }),
+    })
+      .then(function (r) { return r.json() })
+      .then(function (se) {
+        if (!se || !se.id) throw new Error((se && se.error) || 'Could not start')
+        var url = HANDOFF_URL + '?s=' + encodeURIComponent(se.id) + '&t=' + encodeURIComponent(se.token)
+        return loadQrLib().then(function (qr) {
+          var q = qr(0, 'M'); q.addData(url); q.make()
+          box.innerHTML = '<div class="g-rooms-t">scan to use your phone\'s camera</div>' +
+            '<div class="g-qr">' + q.createSvgTag({ cellSize: 4, margin: 1, scalable: true }) + '</div>' +
+            '<div class="g-hand-s">Waiting for your phone…</div>'
+          var tries = 0
+          ;(function tick () {
+            if (tries++ > 150) { box.querySelector('.g-hand-s').textContent = 'Hand-off timed out.'; return }
+            fetch(cfg.endpoint + '?session=' + encodeURIComponent(se.id) + '&t=' + encodeURIComponent(se.token))
+              .then(function (r) { return r.json() })
+              .then(function (j) {
+                if (j && j.status === 'done' && j.result_url) { box.style.display = 'none'; onResult(j.result_url) }
+                else setTimeout(tick, 2000)
+              })
+              .catch(function () { setTimeout(tick, 3000) })
+          })()
+        })
+      })
+      .catch(function () { box.innerHTML = '<div class="g-hand-s">Could not start the hand-off.</div>' })
   }
 
   // ---------------------------------------------------------------- Saved rooms
@@ -525,6 +598,8 @@
             '<input class="l-file" type="file" accept="image/*" capture="environment" style="display:none">' +
             '<img class="g-prev l-prev" alt="your room">' +
             '<div class="g-rooms l-rooms" style="display:none"></div>' +
+            '<button class="g-link g-phone l-phone" style="display:none">📱 Continue on your phone</button>' +
+            '<div class="g-hand l-hand" style="display:none"></div>' +
             '<button class="g-cta l-go" disabled>See my look</button>' +
           '</div>' +
           '<div class="g-step l-step-load" style="display:none"><div class="g-spin"><div class="g-dot"></div>' +
@@ -622,6 +697,14 @@
     })
     pill.addEventListener('click', function () {
       roomsCache = null; refresh(); renderSaved(); lov.classList.add('open'); lshow('upload'); applyBrandConfigTo(L)
+      if (isDesktop()) L('.l-phone').style.display = 'inline-block'
+    })
+    L('.l-phone').addEventListener('click', function () {
+      var all = lookGet(), items = all.slice(0, cap())
+      if (!items.length) return
+      startHandoff({ key: cfg.key, currency: CURRENCY, items: items }, L, function (imgUrl) {
+        finish(imgUrl, items, all.length)
+      })
     })
     L('.l-close').addEventListener('click', function () { lov.classList.remove('open') })
     lov.addEventListener('click', function (e) { if (e.target === lov) lov.classList.remove('open') })
