@@ -38,6 +38,14 @@
   // A product is OPTIONAL: on non-product pages the script still loads so the "Your Look" pill
   // follows the shopper around the store. Without a product we mount the pill only.
   var hasProduct = !!(product && product.image_url)
+  // Colour / fabric / finish options. Each is just a different reference image, which is what a
+  // 2D image model can actually honour — so switching one is a re-render, not a 3D material swap.
+  if (!product.variants) {
+    try { product.variants = JSON.parse(script.getAttribute('data-variants') || '[]') } catch (e) { product.variants = [] }
+  }
+  ;(product.variants || []).forEach(function (v) {
+    if (v && v.image_url && v.image_url.indexOf('//') === 0) v.image_url = 'https:' + v.image_url
+  })
 
   // Consent audit trail. Bump CONSENT_VERSION whenever the wording below changes.
   var CONSENT_VERSION = '2026-10-09.v1'
@@ -121,6 +129,8 @@
   .g-chip{all:unset;cursor:pointer;display:inline-block;font-size:12px;color:#1f2d2b;background:#f0f3f2;\
     border-radius:999px;padding:6px 11px;margin:0 6px 6px 0}\
   .g-chip:hover{background:#e3e9e7}\
+  .g-chip.on{background:#1f2d2b;color:#fff}\
+  .g-vars{margin-top:12px}\
   .g-muted{font-size:12px;color:#8a938f;text-align:center;margin-top:12px}\
   .g-muted a{color:#8a938f}\
   .g-spin{text-align:center;padding:26px 10px;color:#445}\
@@ -165,6 +175,7 @@
           '<div class="g-step g-step-res" style="display:none">' +
             '<div class="g-res"><img alt="your room with the product"></div>' +
             '<div class="g-quote"></div>' +
+            '<div class="g-vars" style="display:none"></div>' +
             '<div class="g-actions"><a class="g-buy" target="_blank" rel="noopener">Buy now</a><button class="g-wa">Share on WhatsApp</button></div>' +
             '<button class="g-link g-again">↻ Try another room</button>' +
           '</div>' +
@@ -315,16 +326,17 @@
     })
   })
 
-  genBtn.addEventListener('click', function () {
-    if (!roomDataUrl && !roomKeyPicked) return
-    roomsCache = null                                  // a new render adds a room; refresh next time
+  // One render call, reused by Generate AND by a variant swap. A variant re-render runs against
+  // the SAME room, so the shopper never leaves the view or re-uploads; it is a normal render and
+  // meters as one.
+  function postRender (prod) {
     show('load')
     var headers = { 'Content-Type': 'application/json' }
     if (cfg.apikey) { headers['apikey'] = cfg.apikey; headers['Authorization'] = 'Bearer ' + cfg.apikey }
-    fetch(cfg.endpoint, {
+    return fetch(cfg.endpoint, {
       method: 'POST', headers: headers,
       body: JSON.stringify({
-        key: cfg.key, product: product,
+        key: cfg.key, product: prod,
         roomImage: roomKeyPicked ? null : roomDataUrl,
         roomKey: roomKeyPicked || null,
         consent: { version: CONSENT_VERSION, at: consentAt },
@@ -336,13 +348,19 @@
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j } }) })
       .then(function (res) {
         if (!res.ok || !res.j.renderDataUrl) throw new Error((res.j && res.j.error) || 'Preview failed — please try again.')
-        renderResult(res.j)
+        renderResult(res.j, prod)
       })
       .catch(function (e) { $('.g-err').textContent = e.message || 'Preview failed — please try again.'; show('err') })
+  }
+
+  genBtn.addEventListener('click', function () {
+    if (!roomDataUrl && !roomKeyPicked) return
+    roomsCache = null                                  // a new render adds a room; refresh next time
+    postRender(product)
   })
 
   var lastRenderUrl = null
-  function renderResult(j) {
+  function renderResult(j, shown) {
     lastRenderUrl = j.renderDataUrl
     $('.g-res img').src = j.renderDataUrl
     var q = j.quote || { items: [], total_inr: product.price_inr }
@@ -354,7 +372,35 @@
     $('.g-quote').innerHTML = html
     var buy = $('.g-buy')
     if (j.buy_link) { buy.href = j.buy_link; buy.style.display = '' } else { buy.style.display = 'none' }
+    paintVariants(shown || product)
     show('res')
+  }
+
+  // Colour / finish switcher. Each chip re-renders the same room against that variant's own
+  // reference image. We deliberately do NOT offer 360° rotation: that needs a real 3D model,
+  // which a 2D image model cannot fake.
+  function paintVariants (shown) {
+    var box = $('.g-vars'), vs = product.variants || []
+    if (vs.length < 2) { box.style.display = 'none'; return }
+    var activeImg = (shown && shown.image_url) || product.image_url
+    box.style.display = 'block'
+    box.innerHTML = '<div class="g-rooms-t">try another finish</div>' + vs.map(function (v, i) {
+      return '<button class="g-chip g-var' + (v.image_url === activeImg ? ' on' : '') +
+        '" data-i="' + i + '">' + v.label + '</button>' }).join('')
+    Array.prototype.forEach.call(box.querySelectorAll('.g-var'), function (b) {
+      b.addEventListener('click', function () {
+        var v = vs[Number(b.getAttribute('data-i'))]
+        if (!v || v.image_url === activeImg) return
+        postRender({
+          name: product.name,
+          price_inr: (v.price_inr != null ? v.price_inr : product.price_inr),
+          image_url: v.image_url,
+          buy_link: v.buy_link || product.buy_link,
+          product_id: product.product_id || null,
+          variant: v.label,
+        })
+      })
+    })
   }
 
   // ---------------------------------------------------------------- Saved rooms
