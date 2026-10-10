@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>See it in your room — Gruha</title>
+<style>
+  :root{--ink:#1f2d2b;--muted:#8a938f;--line:#e9e4dc;--bg:#faf7f2}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:#241f1b;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
+  .wrap{max-width:560px;margin:0 auto;padding:20px 18px 56px}
+  h1{font-size:19px;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 18px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}
+  .item{display:flex;gap:11px;align-items:center;padding:7px 0;border-bottom:1px solid #f3f0ea}
+  .item:last-child{border-bottom:0}
+  .item img{width:46px;height:46px;object-fit:cover;border-radius:9px;background:#f1ece4}
+  .item b{display:block;font-size:14px;font-weight:600}
+  .item span{font-size:13px;color:var(--muted)}
+  label.consent{display:flex;gap:10px;align-items:flex-start;margin:14px 0;font-size:13px;color:#53605c}
+  label.consent input{width:20px;height:20px;margin:1px 0 0;accent-color:var(--ink);flex:0 0 auto}
+  .drop{border:1.5px dashed #cfd6d4;border-radius:14px;padding:26px 16px;text-align:center;color:#667;
+    font-size:15px;background:#fafbfb}
+  .drop.off{opacity:.5}
+  .prev{width:100%;border-radius:14px;margin-top:12px;display:none}
+  button.cta{all:unset;display:block;text-align:center;background:var(--ink);color:#fff;font-weight:700;
+    font-size:16px;padding:16px;border-radius:14px;margin-top:16px}
+  button.cta[disabled]{opacity:.45}
+  .prog{text-align:center;color:#445;padding:22px 8px;font-size:15px}
+  .dot{display:inline-block;width:22px;height:22px;border:3px solid #dfe5e3;border-top-color:var(--ink);
+    border-radius:50%;animation:sp .8s linear infinite;margin-bottom:9px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .res img{width:100%;border-radius:14px;display:block}
+  .ok{background:#e6f3ec;color:#1f7a4d;border-radius:12px;padding:13px;margin-top:14px;font-size:14px;text-align:center}
+  .err{background:#fdeceb;color:#b4231b;border-radius:12px;padding:13px;font-size:14px}
+  .foot{color:var(--muted);font-size:12px;text-align:center;margin-top:20px}
+  a{color:var(--ink)}
+</style></head><body><div class="wrap" id="app"><p class="sub">Loading…</p></div>
+<script>
+(function(){
+  var EP='https://txkxblempgconaeplqde.supabase.co/functions/v1/embed-render';
+  var PRIVACY='https://harshgarg95.github.io/gruha-embed-demo/privacy.html';
+  var CONSENT_VERSION='2026-10-09.v1';
+  var q=new URLSearchParams(location.search), sid=q.get('s'), tok=q.get('t');
+  var app=document.getElementById('app');
+  var esc=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]})};
+  if(!sid||!tok){app.innerHTML='<div class="err">This link is incomplete. Please scan the code again.</div>';return}
+
+  var money=function(n,cur){try{return new Intl.NumberFormat(cur==='INR'?'en-IN':undefined,
+    {style:'currency',currency:cur||'INR'}).format(Number(n||0))}catch(e){return (cur||'INR')+' '+n}};
+
+  fetch(EP+'?session='+encodeURIComponent(sid)+'&t='+encodeURIComponent(tok))
+    .then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j}})})
+    .then(function(res){
+      if(!res.ok) throw new Error(res.j.error||'This hand-off link is no longer valid.');
+      start(res.j.payload||{});
+    })
+    .catch(function(e){app.innerHTML='<div class="err">'+esc(e.message)+'</div>'});
+
+  function start(p){
+    var items=p.items||[], cur=p.currency||'INR', key=p.key;
+    if(!items.length||!key){app.innerHTML='<div class="err">Nothing to preview.</div>';return}
+    app.innerHTML=
+      '<h1>See it in your room</h1>'+
+      '<p class="sub">Continued from your computer · use your camera below</p>'+
+      '<div class="card">'+
+        items.map(function(it){return '<div class="item"><img src="'+esc(it.image_url)+'" alt="">'+
+          '<div><b>'+esc(it.name)+'</b><span>'+money(it.price_inr,cur)+'</span></div></div>'}).join('')+
+        '<label class="consent"><input type="checkbox" id="cb">'+
+          '<span>I agree to Gruha processing and storing my photo to create this preview. '+
+          'It\'s kept private, used only to generate and show your render, and you can ask for it to be '+
+          'deleted. <a href="'+PRIVACY+'" target="_blank" rel="noopener">Privacy note</a></span></label>'+
+        '<div class="drop off" id="drop">📷 Take a photo of your room<br>'+
+          '<span style="font-size:13px" id="hint">tick the box above to continue</span></div>'+
+        '<input id="file" type="file" accept="image/*" capture="environment" style="display:none">'+
+        '<img class="prev" id="prev" alt="your room">'+
+        '<button class="cta" id="go" disabled>Create my preview</button>'+
+      '</div>'+
+      '<div class="foot">Powered by Gruha</div>';
+
+    var cb=document.getElementById('cb'), drop=document.getElementById('drop'), file=document.getElementById('file'),
+        prev=document.getElementById('prev'), go=document.getElementById('go'), hint=document.getElementById('hint');
+    var room=null, meta=null, consentAt=null;
+    function upd(){ go.disabled=!(room&&cb.checked) }
+    cb.addEventListener('change',function(){
+      if(cb.checked&&!consentAt) consentAt=new Date().toISOString();
+      drop.classList.toggle('off',!cb.checked);
+      hint.textContent=cb.checked?'tap to open your camera':'tick the box above to continue';
+      upd();
+    });
+    drop.addEventListener('click',function(){ if(cb.checked) file.click() });
+    file.addEventListener('change',function(){
+      var f=file.files&&file.files[0]; if(!f) return;
+      prep(f,function(d,m){room=d;meta=m;prev.src=d;prev.style.display='block';upd()});
+    });
+
+    // same client-side downscale + quality measurement as the widget
+    function prep(f,cb2){
+      var fr=new FileReader();
+      fr.onload=function(){
+        var im=new Image();
+        im.onload=function(){
+          var ow=im.naturalWidth,oh=im.naturalHeight,m={w:ow,h:oh,bytes:f.size,brightness:null,sharpness:null};
+          try{
+            var S=192,sc=Math.min(S/ow,S/oh,1),mw=Math.max(8,Math.round(ow*sc)),mh=Math.max(8,Math.round(oh*sc));
+            var mc=document.createElement('canvas');mc.width=mw;mc.height=mh;
+            var mx=mc.getContext('2d');mx.drawImage(im,0,0,mw,mh);
+            var d=mx.getImageData(0,0,mw,mh).data,g=new Float32Array(mw*mh),sum=0;
+            for(var i=0,k=0;i<d.length;i+=4,k++){var y=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];g[k]=y;sum+=y}
+            m.brightness=Math.round((sum/g.length)*10)/10;
+            var ls=0,lq=0,n=0;
+            for(var yy=1;yy<mh-1;yy++)for(var xx=1;xx<mw-1;xx++){
+              var o=yy*mw+xx,L=4*g[o]-g[o-1]-g[o+1]-g[o-mw]-g[o+mw];ls+=L;lq+=L*L;n++}
+            if(n){var mu=ls/n;m.sharpness=Math.round(((lq/n)-mu*mu)*10)/10}
+          }catch(e){}
+          var MAX=1440,s2=Math.min(MAX/ow,MAX/oh,1),c=document.createElement('canvas');
+          c.width=Math.max(1,Math.round(ow*s2));c.height=Math.max(1,Math.round(oh*s2));
+          c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+          var out; try{out=c.toDataURL('image/jpeg',0.82)}catch(e){out=fr.result}
+          cb2(out,m);
+        };
+        im.onerror=function(){cb2(fr.result,null)};
+        im.src=fr.result;
+      };
+      fr.readAsDataURL(f);
+    }
+
+    go.addEventListener('click',function(){
+      if(!room||!cb.checked) return;
+      var card=document.querySelector('.card');
+      card.innerHTML='<div class="prog"><div class="dot"></div><div id="pg">Staging your room…</div></div>';
+      var lookId=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():null;
+      var current=room,i=0;
+      (function step(){
+        if(i>=items.length){ done(current); return }
+        var it=items[i];
+        document.getElementById('pg').textContent=items.length>1
+          ? 'Placing '+(i+1)+' of '+items.length+' — '+it.name : 'Staging your room…';
+        fetch(EP,{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            key:key, product:it, roomImage:current, currency:cur,
+            consent:{version:CONSENT_VERSION,at:consentAt},
+            deviceId:devId(), photo:i===0?meta:null,
+            look: (lookId&&items.length>1)?{id:lookId,index:i+1,size:items.length}:null,
+            // the LAST pass hands the finished render back to the waiting desktop
+            sessionId: (i===items.length-1)?sid:null,
+            sessionToken: (i===items.length-1)?tok:null
+          })})
+          .then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j}})})
+          .then(function(res){
+            if(!res.ok||!res.j.renderDataUrl) throw new Error((res.j&&res.j.error)||'Preview failed.');
+            current=res.j.renderDataUrl; i++; step();
+          })
+          .catch(function(e){ card.innerHTML='<div class="err">'+esc(e.message)+'</div>' });
+      })();
+    });
+
+    function done(img){
+      document.querySelector('.card').innerHTML=
+        '<div class="res"><img src="'+img+'" alt="your room"></div>'+
+        '<div class="ok">✓ Sent back to your computer — you can carry on there.</div>';
+    }
+    function devId(){
+      try{var k='gruha_did',v=localStorage.getItem(k);
+        if(!v){v=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now())+Math.random().toString(36).slice(2);
+          localStorage.setItem(k,v)}
+        return v}catch(e){return null}
+    }
+  }
+})();
+</script></body></html>
