@@ -464,16 +464,32 @@
           box.innerHTML = '<div class="g-rooms-t">scan to use your phone\'s camera</div>' +
             '<div class="g-qr">' + q.createSvgTag({ cellSize: 4, margin: 1, scalable: true }) + '</div>' +
             '<div class="g-hand-s">Waiting for your phone…</div>'
-          var tries = 0
+          // Poll for the full life of the session (30 min server-side), measured on the wall
+          // clock -- a try counter lies when the tab is backgrounded and timers get throttled,
+          // which is exactly what happens while the shopper is looking at their phone. Tight
+          // while they are likely mid-shot, slower after, so a long wait stays cheap.
+          var startedAt = Date.now()
+          var SESSION_MS = 30 * 60 * 1000
+          function handEnd (msg) {
+            box.innerHTML = '<div class="g-hand-s">' + msg + '</div>' +
+              '<button class="g-chip g-hand-retry" type="button" style="margin-top:8px">Show a new code</button>'
+            var again = box.querySelector('.g-hand-retry')
+            if (again) again.addEventListener('click', function () { startHandoff(payload, sel, onResult) })
+          }
           ;(function tick () {
-            if (tries++ > 150) { box.querySelector('.g-hand-s').textContent = 'Hand-off timed out.'; return }
+            var waited = Date.now() - startedAt
+            if (waited > SESSION_MS) return handEnd('That code has expired.')
             fetch(cfg.endpoint + '?session=' + encodeURIComponent(se.id) + '&t=' + encodeURIComponent(se.token))
-              .then(function (r) { return r.json() })
-              .then(function (j) {
-                if (j && j.status === 'done' && j.result_url) { box.style.display = 'none'; onResult(j.result_url) }
-                else setTimeout(tick, 2000)
+              .then(function (r) {
+                if (r.status === 410) { handEnd('That code has expired.'); return null }
+                return r.json()
               })
-              .catch(function () { setTimeout(tick, 3000) })
+              .then(function (j) {
+                if (!j) return
+                if (j.status === 'done' && j.result_url) { box.style.display = 'none'; onResult(j.result_url) }
+                else setTimeout(tick, waited < 120000 ? 2000 : 5000)
+              })
+              .catch(function () { setTimeout(tick, 5000) })
           })()
         })
       })
