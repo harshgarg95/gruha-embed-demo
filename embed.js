@@ -35,6 +35,9 @@
     buy_link: script.getAttribute('data-product-buylink') || '',
   }
   if (!cfg.key || !cfg.endpoint) { console.warn('[Gruha] missing data-gruha-key or data-endpoint'); return }
+  // A product is OPTIONAL: on non-product pages the script still loads so the "Your Look" pill
+  // follows the shopper around the store. Without a product we mount the pill only.
+  var hasProduct = !!(product && product.image_url)
 
   // Consent audit trail. Bump CONSENT_VERSION whenever the wording below changes.
   var CONSENT_VERSION = '2026-10-09.v1'
@@ -105,6 +108,9 @@
   .g-drop.g-off:hover{border-color:#e3e7e6;color:#667}\
   .g-consent input{margin:2px 0 0 0;flex:0 0 auto;width:15px;height:15px;accent-color:#1f2d2b;cursor:pointer}\
   .g-consent a{color:#1f2d2b}\
+  .g-addlook{all:unset;cursor:pointer;display:block;text-align:center;font-size:13px;font-weight:600;color:#1f2d2b;\
+    border:1px solid #d8dedc;border-radius:10px;padding:9px;margin:0 0 12px}\
+  .g-addlook:hover{background:#f3f6f5}\
   .g-muted{font-size:12px;color:#8a938f;text-align:center;margin-top:12px}\
   .g-muted a{color:#8a938f}\
   .g-spin{text-align:center;padding:26px 10px;color:#445}\
@@ -131,6 +137,7 @@
         '<div class="g-hd"><h3>See it in your room</h3><button class="g-x" aria-label="Close">×</button></div>' +
         '<div class="g-bd">' +
           '<div class="g-prod"><img src="' + (product.image_url || '') + '" alt=""><div><div class="n"></div><div class="p"></div></div></div>' +
+          '<button class="g-addlook">+ Add to Your Look</button>' +
           '<div class="g-step g-step-upload">' +
             '<label class="g-consent"><input type="checkbox" class="g-consent-cb">' +
               '<span>I agree to Gruha processing and storing my photo to create this preview. ' +
@@ -174,7 +181,9 @@
   btn.addEventListener('mouseenter', function () { btn.style.background = '#2a3d3a' })
   btn.addEventListener('mouseleave', function () { btn.style.background = '#1f2d2b' })
   btn.innerHTML = '<span>🛋️</span><span>' + cfg.label + '</span>'
-  if (cfg.mount && document.querySelector(cfg.mount)) {
+  if (!hasProduct) {
+    // Non-product page: this script is here only so the "Your Look" pill follows the shopper.
+  } else if (cfg.mount && document.querySelector(cfg.mount)) {
     document.querySelector(cfg.mount).appendChild(btn)
   } else {
     var fl = document.createElement('div'); fl.className = 'g-float'; fl.appendChild(btn); root.appendChild(fl)
@@ -189,19 +198,23 @@
   }
   // White-label is a per-brand paid switch, so the widget asks the server (the brand cannot
   // simply strip the badge from the snippet). Fails open = badge stays.
-  var brandCfgRequested = false
-  function applyBrandConfig () {
-    if (brandCfgRequested) return
-    brandCfgRequested = true
-    try {
-      fetch(cfg.endpoint + '?config=1&key=' + encodeURIComponent(cfg.key))
-        .then(function (r) { return r.json() })
-        .then(function (c) {
-          if (c && c.white_label) { var m = $('.g-muted'); if (m) m.style.display = 'none' }
-        })
-        .catch(function () {})
-    } catch (e) {}
+  var brandCfgPromise = null
+  function brandConfig () {
+    if (!brandCfgPromise) {
+      try {
+        brandCfgPromise = fetch(cfg.endpoint + '?config=1&key=' + encodeURIComponent(cfg.key))
+          .then(function (r) { return r.json() }).catch(function () { return {} })
+      } catch (e) { brandCfgPromise = Promise.resolve({}) }
+    }
+    return brandCfgPromise
   }
+  // Hide the badge in whichever shadow root we're given. Fails open: badge stays.
+  function applyBrandConfigTo (sel) {
+    brandConfig().then(function (c) {
+      if (c && c.white_label) { var m = sel('.g-muted'); if (m) m.style.display = 'none' }
+    })
+  }
+  function applyBrandConfig () { applyBrandConfigTo($) }
   function open() { ov.classList.add('open'); show('upload'); applyBrandConfig() }
   function close() { ov.classList.remove('open') }
   btn.addEventListener('click', open)
@@ -322,6 +335,232 @@
     var buy = $('.g-buy')
     if (j.buy_link) { buy.href = j.buy_link; buy.style.display = '' } else { buy.style.display = 'none' }
     show('res')
+  }
+
+  // ---------------------------------------------------------------- Your Look (multi-product)
+  // The look lives in localStorage keyed by brand, so it accumulates as the shopper moves from
+  // one product page to the next (the Shopify block only ever knows about the CURRENT product).
+  var LOOK_KEY = 'gruha_look_' + cfg.key
+  var HARD_CAP = 8                       // never hold more than this
+  var CAP_EMPTY = 6, CAP_FURNISHED = 4   // soft caps from our own render testing
+  function lookGet () { try { return JSON.parse(localStorage.getItem(LOOK_KEY) || '[]') } catch (e) { return [] } }
+  function lookSet (a) {
+    try { localStorage.setItem(LOOK_KEY, JSON.stringify(a.slice(0, HARD_CAP))) } catch (e) {}
+    if (window.__gruhaLookRefresh) window.__gruhaLookRefresh()
+  }
+  function lookAdd (p) {
+    var a = lookGet()
+    if (a.some(function (x) { return x.image_url === p.image_url && x.name === p.name })) return 'dup'
+    if (a.length >= HARD_CAP) return 'full'
+    a.push({ name: p.name, price_inr: p.price_inr, image_url: p.image_url, buy_link: p.buy_link,
+             product_id: p.product_id || null, variant: p.variant || null })
+    lookSet(a); return 'ok'
+  }
+
+  if (hasProduct) {
+    var addBtn = $('.g-addlook')
+    addBtn.addEventListener('click', function () {
+      var r = lookAdd(product)
+      addBtn.textContent = r === 'ok' ? '✓ Added to Your Look'
+        : r === 'dup' ? 'Already in Your Look'
+        : 'Your Look is full (' + HARD_CAP + ')'
+      setTimeout(function () { addBtn.textContent = '+ Add to Your Look' }, 1800)
+    })
+  }
+
+  // One pill + drawer per page, no matter how many product scripts the page carries.
+  if (!window.__gruhaLookMounted) {
+    window.__gruhaLookMounted = true
+    mountLook()
+  }
+
+  function mountLook () {
+    var lh = document.createElement('div')
+    lh.setAttribute('data-gruha-look', '')
+    lh.style.setProperty('display', 'block', 'important')   // themes hide :empty divs (Dawn)
+    document.body.appendChild(lh)
+    var lr = lh.attachShadow({ mode: 'open' })
+    lr.innerHTML =
+      '<style>' + CSS +
+      '.l-pill{position:fixed;left:18px;bottom:18px;z-index:2147483000;all:unset;cursor:pointer;' +
+        'display:none;align-items:center;gap:8px;background:#b08642;color:#fff;font-weight:700;font-size:14px;' +
+        'line-height:1;padding:12px 17px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.22);' +
+        'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}' +
+      '.l-row{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #f0eee9}' +
+      '.l-row img{width:42px;height:42px;object-fit:cover;border-radius:8px;background:#f3f3f1}' +
+      '.l-row .t{flex:1;min-width:0}.l-row .t b{display:block;font-size:13px;font-weight:600;' +
+        'overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
+      '.l-row .t span{font-size:12px;color:#8a938f}' +
+      '.l-x{all:unset;cursor:pointer;color:#b4231b;font-size:17px;padding:0 4px}' +
+      '.l-seg{display:flex;gap:6px;margin:12px 0}' +
+      '.l-seg button{all:unset;cursor:pointer;flex:1;text-align:center;font-size:12px;font-weight:600;' +
+        'padding:8px;border-radius:9px;border:1px solid #d8dedc;color:#53605c}' +
+      '.l-seg button[aria-pressed="true"]{background:#1f2d2b;color:#fff;border-color:#1f2d2b}' +
+      '.l-note{font-size:12px;color:#8a938f;margin-top:8px;line-height:1.5}' +
+      '.l-warn{font-size:12px;color:#8a6d1f;background:#fdf6e6;border-radius:9px;padding:9px 11px;margin-top:10px}' +
+      '</style>' +
+      '<button class="l-pill"><span>🛋️</span><span class="l-pill-t">Your Look</span></button>' +
+      '<div class="g-ov l-ov"><div class="g-card"><div class="g-hd">' +
+        '<h3>Your Look</h3><button class="g-x l-close" aria-label="Close">×</button></div>' +
+        '<div class="g-bd">' +
+          '<div class="l-items"></div>' +
+          '<div class="l-seg"><button class="l-furn" aria-pressed="true">My room has furniture</button>' +
+            '<button class="l-empty" aria-pressed="false">My room is empty</button></div>' +
+          '<div class="l-warn" style="display:none"></div>' +
+          '<button class="g-addlook l-more">+ Add another product</button>' +
+          '<div class="g-step l-step-upload">' +
+            '<label class="g-consent"><input type="checkbox" class="l-consent-cb">' +
+              '<span>I agree to Gruha processing and storing my photo to create this preview. ' +
+              'It\'s kept private, used only to generate and show your render, and you can ask for it ' +
+              'to be deleted. <a href="' + PRIVACY_URL + '" target="_blank" rel="noopener">Privacy note</a>' +
+              '</span></label>' +
+            '<div class="g-drop l-drop g-off" aria-disabled="true">📷 Upload a photo of your room<br>' +
+              '<span style="font-size:12px">tick the box above to continue</span></div>' +
+            '<input class="l-file" type="file" accept="image/*" capture="environment" style="display:none">' +
+            '<img class="g-prev l-prev" alt="your room">' +
+            '<button class="g-cta l-go" disabled>See my look</button>' +
+          '</div>' +
+          '<div class="g-step l-step-load" style="display:none"><div class="g-spin"><div class="g-dot"></div>' +
+            '<div class="l-prog">Staging your room…</div></div></div>' +
+          '<div class="g-step l-step-res" style="display:none">' +
+            '<div class="g-res"><img alt="your look"></div><div class="g-quote l-quote"></div>' +
+            '<div class="g-actions"><button class="g-wa l-wa">Share on WhatsApp</button></div>' +
+            '<button class="g-link l-again">↻ Try another room</button></div>' +
+          '<div class="g-step l-step-err" style="display:none"><div class="g-err l-err"></div>' +
+            '<button class="g-cta l-retry">Try again</button></div>' +
+          '<div class="g-muted l-muted">Powered by <a href="https://gruha-decor-studio.vercel.app" target="_blank" rel="noopener">Gruha</a></div>' +
+        '</div></div></div>'
+
+    var L = function (s) { return lr.querySelector(s) }
+    var pill = L('.l-pill'), lov = L('.l-ov'), lfile = L('.l-file'), lprev = L('.l-prev')
+    var lgo = L('.l-go'), lcb = L('.l-consent-cb'), ldrop = L('.l-drop')
+    var roomType = 'furnished', lroom = null, lmeta = null, lconsentAt = null, lastLook = null
+
+    function cap () { return roomType === 'empty' ? CAP_EMPTY : CAP_FURNISHED }
+    function lshow (st) {
+      ;['upload', 'load', 'res', 'err'].forEach(function (x) {
+        L('.l-step-' + x).style.display = x === st ? 'block' : 'none' })
+    }
+    function refresh () {
+      var a = lookGet()
+      pill.style.display = a.length ? 'inline-flex' : 'none'
+      L('.l-pill-t').textContent = 'Your Look (' + a.length + ')'
+      L('.l-items').innerHTML = a.length ? a.map(function (it, i) {
+        return '<div class="l-row"><img src="' + (it.image_url || '') + '" alt="">' +
+          '<div class="t"><b>' + (it.name || '') + '</b><span>' + money(it.price_inr) + '</span></div>' +
+          '<button class="l-x" data-i="' + i + '" aria-label="Remove">×</button></div>' }).join('')
+        : '<p class="l-note">Nothing here yet. Open a product and tap “Add to Your Look”.</p>'
+      Array.prototype.forEach.call(lr.querySelectorAll('.l-x'), function (b) {
+        b.addEventListener('click', function () {
+          var arr = lookGet(); arr.splice(Number(b.getAttribute('data-i')), 1); lookSet(arr)
+        })
+      })
+      var w = L('.l-warn')
+      if (a.length > cap()) {
+        w.style.display = 'block'
+        w.textContent = 'A ' + (roomType === 'empty' ? 'empty' : 'furnished') + ' room holds about ' +
+          cap() + ' pieces convincingly. We\'ll show your top ' + cap() + ' of ' + a.length + '.'
+      } else w.style.display = 'none'
+      lgo.textContent = 'See my look' + (a.length ? ' (' + Math.min(a.length, cap()) + ')' : '')
+    }
+    window.__gruhaLookRefresh = refresh
+
+    function updL () {
+      if (lroom && lcb.checked) lgo.removeAttribute('disabled'); else lgo.setAttribute('disabled', '')
+    }
+    lcb.addEventListener('change', function () {
+      var ok = lcb.checked
+      if (ok && !lconsentAt) lconsentAt = new Date().toISOString()
+      ldrop.classList.toggle('g-off', !ok)
+      ldrop.setAttribute('aria-disabled', ok ? 'false' : 'true')
+      var h = ldrop.querySelector('span')
+      if (h) h.textContent = ok ? 'tap to choose or take a photo' : 'tick the box above to continue'
+      updL()
+    })
+    ldrop.addEventListener('click', function () { if (lcb.checked) lfile.click() })
+    lfile.addEventListener('change', function () {
+      var f = lfile.files && lfile.files[0]; if (!f) return
+      prepPhoto(f, function (d, m) { lroom = d; lmeta = m; lprev.src = d; lprev.style.display = 'block'; updL() })
+    })
+    pill.addEventListener('click', function () { refresh(); lov.classList.add('open'); lshow('upload'); applyBrandConfigTo(L) })
+    L('.l-close').addEventListener('click', function () { lov.classList.remove('open') })
+    lov.addEventListener('click', function (e) { if (e.target === lov) lov.classList.remove('open') })
+    L('.l-more').addEventListener('click', function () { lov.classList.remove('open') })
+    L('.l-retry').addEventListener('click', function () { lshow('upload') })
+    L('.l-again').addEventListener('click', function () { lroom = null; lprev.style.display = 'none'; updL(); lshow('upload') })
+    ;[['furn', 'furnished'], ['empty', 'empty']].forEach(function (pair) {
+      L('.l-' + pair[0]).addEventListener('click', function () {
+        roomType = pair[1]
+        L('.l-furn').setAttribute('aria-pressed', String(roomType === 'furnished'))
+        L('.l-empty').setAttribute('aria-pressed', String(roomType === 'empty'))
+        refresh()
+      })
+    })
+
+    lgo.addEventListener('click', function () {
+      var all = lookGet(), items = all.slice(0, cap())
+      if (!items.length || !lroom) return
+      lshow('load')
+      // SEQUENTIAL: one product per pass, each pass feeding the previous render forward. This is
+      // what our testing showed keeps the room locked and each product recognisable; a single
+      // multi-reference call drifts the camera and oversizes large items. Each pass is a real
+      // render, so a look of N items costs N credits — that is deliberate and documented.
+      var lookId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : null
+      var current = lroom, i = 0
+      function step () {
+        if (i >= items.length) { finish(current, items, all.length); return }
+        var it = items[i]
+        L('.l-prog').textContent = 'Placing ' + (i + 1) + ' of ' + items.length + ' — ' + (it.name || 'item')
+        fetch(cfg.endpoint, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            key: cfg.key, roomImage: current, product: it, currency: CURRENCY,
+            consent: { version: CONSENT_VERSION, at: lconsentAt }, deviceId: deviceId(),
+            photo: i === 0 ? lmeta : null,                       // only pass 1 is a real shopper photo
+            look: lookId ? { id: lookId, index: i + 1, size: items.length } : null,
+          }),
+        }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j } }) })
+          .then(function (res) {
+            if (!res.ok || !res.j.renderDataUrl) throw new Error((res.j && res.j.error) || 'Preview failed.')
+            current = res.j.renderDataUrl; i++; step()
+          })
+          .catch(function (e) { L('.l-err').textContent = e.message || 'Preview failed.'; lshow('err') })
+      }
+      step()
+    })
+
+    function finish (img, items, total) {
+      lastLook = img
+      L('.l-step-res').querySelector('img').src = img
+      var sum = 0
+      var rows = items.map(function (it) {
+        sum += Number(it.price_inr) || 0
+        var nm = it.buy_link ? '<a href="' + it.buy_link + '" target="_blank" rel="noopener">' + it.name + '</a>' : it.name
+        return '<div class="g-row"><span>' + nm + ' × 1</span><span>' + money(it.price_inr) + '</span></div>'
+      }).join('')
+      if (total > items.length) {
+        rows += '<div class="g-row"><span style="color:#8a6d1f">Showing your top ' + items.length +
+          ' of ' + total + '</span><span></span></div>'
+      }
+      L('.l-quote').innerHTML = rows + '<div class="g-tot"><span>Total</span><span>' + money(sum) + '</span></div>'
+      lshow('res')
+    }
+
+    L('.l-wa').addEventListener('click', function () {
+      var items = lookGet().slice(0, cap())
+      var msg = 'My look: ' + items.map(function (i) { return i.name }).join(', ')
+      function fb () { window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank') }
+      try {
+        if (navigator.canShare && lastLook) {
+          fetch(lastLook).then(function (r) { return r.blob() }).then(function (b) {
+            var f = new File([b], 'gruha-look.jpg', { type: b.type || 'image/jpeg' })
+            if (navigator.canShare({ files: [f] })) navigator.share({ files: [f], text: msg }).catch(fb); else fb()
+          }).catch(fb)
+        } else fb()
+      } catch (e) { fb() }
+    })
+
+    refresh()
   }
 
   // WhatsApp: share the actual render image where the browser supports it (mobile), else a text link.
