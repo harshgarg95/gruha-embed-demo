@@ -458,7 +458,7 @@
       var w = L('.l-warn')
       if (a.length > cap()) {
         w.style.display = 'block'
-        w.textContent = 'A ' + (roomType === 'empty' ? 'empty' : 'furnished') + ' room holds about ' +
+        w.textContent = (roomType === 'empty' ? 'An empty' : 'A furnished') + ' room holds about ' +
           cap() + ' pieces convincingly. We\'ll show your top ' + cap() + ' of ' + a.length + '.'
       } else w.style.display = 'none'
       lgo.textContent = 'See my look' + (a.length ? ' (' + Math.min(a.length, cap()) + ')' : '')
