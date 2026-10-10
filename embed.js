@@ -381,7 +381,11 @@
   // which a 2D image model cannot fake.
   function paintVariants (shown) {
     var box = $('.g-vars'), vs = product.variants || []
-    if (vs.length < 2) { box.style.display = 'none'; return }
+    // Only worth showing if the variants actually LOOK different. Many catalogues (Shopify's own
+    // sample data included) reuse one image for every variant — chips that all re-render the same
+    // reference would just be dead buttons.
+    var distinct = {}; vs.forEach(function (v) { if (v && v.image_url) distinct[v.image_url] = 1 })
+    if (vs.length < 2 || Object.keys(distinct).length < 2) { box.style.display = 'none'; return }
     var activeImg = (shown && shown.image_url) || product.image_url
     box.style.display = 'block'
     box.innerHTML = '<div class="g-rooms-t">try another finish</div>' + vs.map(function (v, i) {
