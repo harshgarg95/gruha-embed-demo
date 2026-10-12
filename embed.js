@@ -356,6 +356,7 @@
   // One render call, reused by Generate AND by a variant swap. A variant re-render runs against
   // the SAME room, so the shopper never leaves the view or re-uploads; it is a normal render and
   // meters as one.
+  var inFlight = false
   function postRender (prod) {
     show('load')
     var headers = { 'Content-Type': 'application/json' }
@@ -375,13 +376,21 @@
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j } }) })
       .then(function (res) {
         if (!res.ok || !res.j.renderDataUrl) throw new Error((res.j && res.j.error) || 'Preview failed — please try again.')
+        inFlight = false
         renderResult(res.j, prod)
       })
-      .catch(function (e) { $('.g-err').textContent = e.message || 'Preview failed — please try again.'; show('err') })
+      .catch(function (e) { inFlight = false; $('.g-err').textContent = e.message || 'Preview failed — please try again.'; show('err') })
   }
 
+  // A rapid double-tap must never buy two renders. Observed behaviour was already one render per
+  // double-tap, but nothing in the code guaranteed it: show('load') merely hides the button, which
+  // is a layout accident rather than a lock. inFlight is the actual guarantee, and both the success
+  // and failure paths clear it so a failed render can still be retried.
   genBtn.addEventListener('click', function () {
+    if (inFlight) return
     if (!roomDataUrl && !roomKeyPicked) return
+    inFlight = true
+    genBtn.setAttribute('disabled', '')
     roomsCache = null                                  // a new render adds a room; refresh next time
     postRender(product)
   })
