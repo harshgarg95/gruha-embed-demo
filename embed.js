@@ -146,12 +146,21 @@
   .g-row{display:flex;justify-content:space-between;font-size:14px;color:#333;padding:3px 0}\
   .g-tot{display:flex;justify-content:space-between;font-weight:800;color:#1f2d2b;border-top:1px solid #eee;\
     margin-top:6px;padding-top:8px;font-size:15px}\
-  .g-actions{display:flex;gap:10px;margin-top:14px}\
-  .g-actions>*{flex:1;all:unset;cursor:pointer;text-align:center;padding:12px;border-radius:12px;font-weight:700;font-size:14px}\
+  .g-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}\
+  .g-actions>*{flex:1 1 30%;min-width:98px;all:unset;cursor:pointer;text-align:center;padding:12px;border-radius:12px;font-weight:700;font-size:14px;box-sizing:border-box}\
+  .g-dl{background:#f0f3f2;color:#1f2d2b;box-shadow:inset 0 0 0 1px #d8dedc}\
+  .g-dl:hover{background:#e6ecea}\
   .g-buy{background:#1f2d2b;color:#fff}\
   .g-wa{background:#25d366;color:#fff}\
   .g-err{background:#fdeceb;color:#b4231b;border-radius:12px;padding:12px 14px;font-size:14px;margin-top:4px}\
-  .g-link{all:unset;cursor:pointer;color:#1f2d2b;font-weight:600;text-decoration:underline;font-size:14px;display:inline-block;margin-top:10px}'
+  .g-link{all:unset;cursor:pointer;color:#1f2d2b;font-weight:600;text-decoration:underline;font-size:14px;display:inline-block;margin-top:10px}\
+  .g-tips{background:#f7f9f8;border:1px solid #e7ecea;border-radius:12px;padding:10px 12px;margin:0 0 12px}\
+  .g-tips-t{font-size:12px;font-weight:700;color:#1f2d2b;margin-bottom:8px;letter-spacing:.01em}\
+  .g-tips-g{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}\
+  .g-tip{display:flex;gap:7px;align-items:flex-start;font-size:12px;line-height:1.35;color:#4a5351}\
+  .g-tip svg{flex:0 0 auto;width:26px;height:26px;margin-top:-1px}\
+  .g-tip.no{color:#8a5a55}\
+  @media (max-width:360px){.g-tips-g{grid-template-columns:1fr}}'
 
   var el = document.createElement('div')
   el.innerHTML =
@@ -168,7 +177,15 @@
               'It\'s kept private, used only to generate and show your render, and you can ask for it ' +
               'to be deleted. <a href="' + PRIVACY_URL + '" target="_blank" rel="noopener">Privacy note</a>' +
               '</span></label>' +
-            '<div class="g-drop g-off" aria-disabled="true">📷 Upload a photo of your room<br>' +
+            '<div class="g-tips">' +
+            '<div class="g-tips-t">For the best result</div>' +
+            '<div class="g-tips-g">' +
+            '<div class="g-tip "><svg viewBox="0 0 24 24" fill="none" stroke="#1f2d2b" stroke-width="1.6" stroke-linecap="round"><path d="M3 4v16M21 4v16M3 15h18"/><path d="M8 19l-3-2 3-2M16 19l3-2-3-2M5 17h14"/></svg><span>Stand back so the floor and a wall are both in shot</span></div>' +
+            '<div class="g-tip "><svg viewBox="0 0 24 24" fill="none" stroke="#1f2d2b" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="11" r="4"/><path d="M12 2v2M12 18v2M3 11h2M19 11h2M5.6 4.6l1.4 1.4M17 17l1.4 1.4M18.4 4.6L17 6M7 17l-1.4 1.4"/></svg><span>Switch the lights on, or shoot in daylight</span></div>' +
+            '<div class="g-tip "><svg viewBox="0 0 24 24" fill="none" stroke="#1f2d2b" stroke-width="1.6" stroke-linecap="round"><rect x="8" y="2.5" width="8" height="19" rx="1.6"/><path d="M4 12h3M17 12h3"/></svg><span>Hold your phone upright and level</span></div>' +
+            '<div class="g-tip no"><svg viewBox="0 0 24 24" fill="none" stroke="#b4231b" stroke-width="1.6" stroke-linecap="round"><rect x="4" y="4" width="16" height="14" rx="1.5"/><path d="M12 4v14M4 11h16"/><path d="M3 21L21 3" stroke-width="2"/></svg><span>Don&rsquo;t shoot straight into a window</span></div>' +
+            '</div></div>' +
+          '<div class="g-drop g-off" aria-disabled="true">📷 Upload a photo of your room<br>' +
               '<span style="font-size:12px">tick the box above to continue</span></div>' +
             '<input class="g-file" type="file" accept="image/*" capture="environment" style="display:none">' +
             '<img class="g-prev" alt="your room">' +
@@ -177,12 +194,13 @@
             '<div class="g-hand" style="display:none"></div>' +
             '<button class="g-cta" disabled>Generate</button>' +
           '</div>' +
-          '<div class="g-step g-step-load" style="display:none"><div class="g-spin"><div class="g-dot"></div><div>Staging your room… about 15 seconds</div></div></div>' +
+          '<div class="g-step g-step-load" style="display:none"><div class="g-spin"><div class="g-dot"></div><div>Staging your room… this usually takes 20–30 seconds</div></div></div>' +
           '<div class="g-step g-step-res" style="display:none">' +
             '<div class="g-res"><img alt="your room with the product"></div>' +
             '<div class="g-quote"></div>' +
             '<div class="g-vars" style="display:none"></div>' +
-            '<div class="g-actions"><a class="g-buy" target="_blank" rel="noopener">Buy now</a><button class="g-wa">Share on WhatsApp</button></div>' +
+            '<div class="g-actions"><a class="g-buy" target="_blank" rel="noopener">Buy now</a><button class="g-wa">Share on WhatsApp</button>' +
+              '<a class="g-dl" download>Download</a></div>' +
             '<button class="g-link g-again">↻ Try another room</button>' +
           '</div>' +
           '<div class="g-step g-step-err" style="display:none"><div class="g-err"></div><button class="g-cta g-retry">Try again</button></div>' +
@@ -371,6 +389,7 @@
   $('.g-phone').addEventListener('click', function () {
     startHandoff({ key: cfg.key, currency: CURRENCY, items: [product] }, $, function (imgUrl) {
       $('.g-res img').src = imgUrl
+      wireDownload(imgUrl, product.name)
       $('.g-quote').innerHTML = '<div class="g-row"><span>' + product.name + ' × 1</span><span>' +
         money(product.price_inr) + '</span></div><div class="g-tot"><span>Total</span><span>' +
         money(product.price_inr) + '</span></div>'
@@ -382,9 +401,33 @@
   })
 
   var lastRenderUrl = null
+
+  // The result can be a data: URL (normal render) or a cross-origin signed R2 URL (phone
+  // hand-off). Browsers IGNORE the download attribute on a cross-origin href and navigate
+  // instead, so that case is fetched to a blob first. The shopper is on the brand's own site,
+  // not in a sandboxed frame, so a plain anchor is all this needs.
+  function wireDownload(url, prodName) {
+    var a = $('.g-dl')
+    if (!a) return
+    var safe = String(prodName || 'room').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48)
+    var name = 'gruha-' + (safe || 'room') + '.jpg'
+    a.setAttribute('download', name)
+    a.href = url || '#'
+    a.style.display = url ? '' : 'none'
+    a.onclick = function (e) {
+      if (!url || url.indexOf('data:') === 0) return           // same-origin data URL: let it through
+      e.preventDefault()
+      fetch(url).then(function (r) { return r.blob() }).then(function (b) {
+        var o = URL.createObjectURL(b), t = document.createElement('a')
+        t.href = o; t.download = name; document.body.appendChild(t); t.click()
+        document.body.removeChild(t); setTimeout(function () { URL.revokeObjectURL(o) }, 10000)
+      }).catch(function () { window.open(url, '_blank', 'noopener') })
+    }
+  }
   function renderResult(j, shown) {
     lastRenderUrl = j.renderDataUrl
     $('.g-res img').src = j.renderDataUrl
+    wireDownload(j.renderDataUrl, (shown && shown.name) || product.name)
     var q = j.quote || { items: [], total_inr: product.price_inr }
     var html = ''
     ;(q.items || []).forEach(function (it) {
