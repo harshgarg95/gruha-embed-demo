@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>See it in your room — Gruha</title>
+<meta name="description" content="What the Gruha &quot;See it in your room&quot; embed does, and what it costs.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Karla:wght@400;500;600;700&display=swap">
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#F7F8F6; --surface:#FFFFFF; --sand:#EFF1EC;
+  --ink:#1A211E; --ink-soft:#56635E; --ink-faint:#8A958F;
+  --rule:#DCE0DA; --rule-soft:#E7EAE4;
+  --accent:#1F5F4B; --accent-ink:#1F5F4B; --accent-soft:#E2EFE9;
+  --display:'Fraunces',Georgia,serif;
+  --body:'Karla',system-ui,-apple-system,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#10140F; --surface:#171C16; --sand:#1B211A;
+  --ink:#E9EDE6; --ink-soft:#A8B4AA; --ink-faint:#7C8A80;
+  --rule:#2B332A; --rule-soft:#232B22;
+  --accent:#5FC79E; --accent-ink:#78D4B0; --accent-soft:#16301F;
+  color-scheme:dark;
+}}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;
+  -webkit-font-smoothing:antialiased}
+img{max-width:100%}
+.wrap{max-width:920px;margin:0 auto;padding-left:24px;padding-right:24px;padding-block:56px 80px}
+
+h1{font-family:var(--display);font-size:clamp(40px,8vw,64px);line-height:.99;letter-spacing:-.025em;
+  font-weight:600;margin:0 0 18px;text-wrap:balance}
+h2{font-family:var(--display);font-size:clamp(22px,3.4vw,28px);line-height:1.1;letter-spacing:-.015em;
+  font-weight:600;margin:0 0 24px}
+.eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--accent-ink);margin:0 0 14px}
+.lede{font-size:20px;line-height:1.45;color:var(--ink-soft);max-width:34ch;margin:0 0 16px}
+.why{font-size:16.5px;color:var(--ink);max-width:52ch;margin:0;padding-left:14px;border-left:2px solid var(--accent)}
+section{margin-top:64px}
+
+figure{margin:36px 0 0}
+figure img{display:block;width:100%;border:1px solid var(--rule);border-radius:5px;background:var(--sand)}
+
+.try{margin-top:28px}
+.btn{display:inline-block;background:var(--accent);color:#fff;font-weight:600;font-size:16px;
+  padding:13px 22px;border-radius:4px;text-decoration:none}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn{color:#0C1A14}}
+.try small{display:block;margin-top:9px;font-size:13.5px;color:var(--ink-faint)}
+
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:18px;margin-top:30px;
+  padding-top:22px;border-top:1px solid var(--rule-soft)}
+.flow div{min-width:0;font-size:14.5px;color:var(--ink-faint)}
+.flow b{display:block;font-size:16px;font-weight:600;color:var(--ink);margin-bottom:1px}
+
+.list{display:grid;grid-template-columns:repeat(auto-fit,minmax(236px,1fr));gap:2px 32px}
+.list div{position:relative;padding:9px 0 9px 26px;font-size:16px;font-weight:500;min-width:0;
+  border-bottom:1px solid var(--rule-soft)}
+.list div::before{content:"";position:absolute;left:3px;top:15px;width:11px;height:6px;
+  border-left:2px solid var(--accent);border-bottom:2px solid var(--accent);transform:rotate(-45deg)}
+
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(212px,1fr));gap:16px}
+.plan{background:var(--surface);border:1px solid var(--rule);border-radius:5px;padding:22px 20px;min-width:0;
+  display:flex;flex-direction:column}
+.plan.on{border-color:var(--accent);background:var(--accent-soft)}
+.plan .nm{font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px}
+.plan.on .nm{color:var(--accent-ink)}
+.plan .amt{font-family:var(--display);font-size:36px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.plan .per{font-size:13px;color:var(--ink-faint);margin:6px 0 16px}
+.plan .inc{font-size:15px;border-top:1px solid var(--rule-soft);padding-top:14px;margin-top:auto;
+  font-variant-numeric:tabular-nums;color:var(--ink-soft)}
+.plan .inc b{display:block;color:var(--ink);font-size:17px;font-weight:700}
+
+.rate{display:flex;flex-wrap:wrap;gap:10px 34px;margin-top:22px;padding:18px 20px;background:var(--sand);border-radius:5px}
+.rate div{min-width:0}
+.rate .k{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:3px}
+.rate .v{font-size:16.5px;font-variant-numeric:tabular-nums}
+.small{margin-top:22px;font-size:14px;color:var(--ink-soft);max-width:68ch}
+.small b{color:var(--ink);font-weight:600}
+
+.also{display:grid;grid-template-columns:repeat(auto-fit,minmax(252px,1fr));gap:4px 32px;margin-top:4px}
+.also div{font-size:14.2px;color:var(--ink-soft);padding:5px 0;min-width:0}
+.also b{color:var(--ink)}
+
+.cta{margin-top:64px;border-top:1px solid var(--ink);padding-top:26px}
+.cta p{font-size:16.5px;max-width:52ch;margin:0 0 14px}
+a{color:var(--accent-ink)}
+.cta a{text-decoration:underline;text-underline-offset:3px}
+.foot{margin-top:34px;font-size:12.5px;color:var(--ink-faint);max-width:68ch}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Gruha</p>
+  <h1>See it in your room</h1>
+  <p class="lede">Your shopper photographs their own room. Your product appears in it, with your price beside it.</p>
+  <p class="why">A ₹73,000 centre table is a hard thing to buy from a photograph on a white background. This lets someone see it standing where it would actually stand, before they decide.</p>
+
+  <p class="try">
+    <a class="btn" href="https://room.gruhalabs.com/decorkart">See it working →</a>
+    <small>A live demo on a real catalogue. No login, no password.</small>
+  </p>
+
+  <figure>
+    <img src="shopper-view.jpg" alt="A product page with the See it in your room panel open: the product thumbnail and price, the shopper's room with a sofa placed in it, an itemised total in rupees, and Buy now and Share on WhatsApp buttons.">
+  </figure>
+
+  <div class="flow">
+    <div><b>They tap</b>On your product page</div>
+    <div><b>They send a photo</b>Camera or gallery</div>
+    <div><b>They see it placed</b>About 25 seconds</div>
+  </div>
+
+  <section>
+    <h2>Features</h2>
+    <div class="list">
+      <div>Button on every product page</div>
+      <div>Renders into the shopper's own photo</div>
+      <div>Several products in one room</div>
+      <div>Colour and fabric variants</div>
+      <div>Phone camera capture</div>
+      <div>QR code, desktop to phone</div>
+      <div>Photo guide before upload</div>
+      <div>Saved rooms and saved looks</div>
+      <div>Itemised price in rupees</div>
+      <div>Buy now from the render</div>
+      <div>Share on WhatsApp</div>
+      <div>Download the render</div>
+      <div>Live usage dashboard</div>
+      <div>Most-visualised products</div>
+      <div>CSV export</div>
+      <div>Shopify app, one switch</div>
+      <div>Works on other platforms</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Plans</h2>
+    <div class="plans">
+      <div class="plan">
+        <div class="nm">Starter</div>
+        <div class="amt">₹4,999</div>
+        <div class="per">per month</div>
+        <div class="inc"><b>5,000 credits</b>about 125 renders</div>
+      </div>
+      <div class="plan on">
+        <div class="nm">Growth</div>
+        <div class="amt">₹9,999</div>
+        <div class="per">per month</div>
+        <div class="inc"><b>10,000 credits</b>about 250 renders</div>
+      </div>
+      <div class="plan">
+        <div class="nm">White-label</div>
+        <div class="amt">₹17,999</div>
+        <div class="per">per month</div>
+        <div class="inc"><b>10,000 credits</b>250 renders, no Gruha badge</div>
+      </div>
+    </div>
+
+    <div class="rate">
+      <div><div class="k">One credit</div><div class="v">₹1</div></div>
+      <div><div class="k">One render</div><div class="v">40 credits</div></div>
+      <div><div class="k">Four products in a room</div><div class="v">160 credits</div></div>
+      <div><div class="k">Failed render</div><div class="v">Free</div></div>
+    </div>
+
+    <p class="small">Not sure which to pick? Start on Starter — you can change plan or top up from the dashboard at any time. Top-ups are the same rate: <b>₹2,000 buys 2,000 credits</b>, they never expire, and they are only used once the monthly credits run out. Monthly credits do not carry over. <b>20% off</b> annual plans. Cancel any time. Prices exclude GST.</p>
+  </section>
+
+  <section>
+    <h2>How we start</h2>
+    <div class="also">
+      <div><b>1 · We load your products</b> onto a private storefront and test the renders on real rooms.</div>
+      <div><b>2 · You try it yourself</b> on your own living room, and tell us what you think.</div>
+      <div><b>3 · We switch it on</b> in your theme editor. Nothing in your theme is edited, and it comes off just as easily.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Also included</h2>
+    <div class="also">
+      <div>Products placed automatically, at true scale</div>
+      <div>Lighting and shadows matched to the room</div>
+      <div>Runs on your existing catalogue photos — no 3D models</div>
+      <div>Renders kept 90 days, yours to reuse in your marketing</div>
+      <div>Consent taken before any photo is sent, never pre-ticked</div>
+      <div>Photos deleted after 90 days</div>
+      <div>No daily cap on your shoppers</div>
+      <div>Nothing in your theme is edited</div>
+    </div>
+  </section>
+
+  <div class="cta">
+    <h2>Try it on your own room</h2>
+    <p>We'll put your products on a private storefront and send you the link.</p>
+    <p>Harsh Garg · <a href="mailto:hello@gruhalabs.com">hello@gruhalabs.com</a><br>
+    <span style="color:var(--ink-faint);font-size:14px">Gruha · Hyderabad</span></p>
+  </div>
+
+  <p class="foot">Each render is generated from your catalogue photograph and the shopper's room photograph. Results vary with the room; we test on your products before anything goes live.</p>
+</div>
+</body>
+</html>

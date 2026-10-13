@@ -233,6 +233,10 @@
     document.querySelector(cfg.mount).appendChild(btn)
   } else {
     var fl = document.createElement('div'); fl.className = 'g-float'; fl.appendChild(btn); root.appendChild(fl)
+    // The trigger is now bottom-RIGHT and so is the Your Look pill, so the pill has to stack above
+    // it. A global flag rather than a DOM query because either script instance may mount first:
+    // the one that floats a trigger is not necessarily the one that mounts the pill.
+    window.__gruhaFloatingTrigger = true
   }
 
   var ov = $('.g-ov'), fileInput = $('.g-file'), prev = $('.g-prev'), genBtn = $('.g-cta')
@@ -628,10 +632,18 @@
     var lr = lh.attachShadow({ mode: 'open' })
     lr.innerHTML =
       '<style>' + CSS +
-      '.l-pill{position:fixed;left:18px;bottom:18px;z-index:2147483000;all:unset;cursor:pointer;' +
-        'display:none;align-items:center;gap:8px;background:#b08642;color:#fff;font-weight:700;font-size:14px;' +
-        'line-height:1;padding:12px 17px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.22);' +
+      // `all:unset` MUST come first. It used to sit after position/left/bottom/z-index and reset
+      // every one of them, so the pill computed to position:static and sat in normal flow at the
+      // very end of <body> -- on a live product page that left ~15px of it peeking above the fold
+      // at the bottom-left, label cut off. Measured on the live page before the fix:
+      // position:static, left:auto, bottom:auto, z-index:auto, rect y=728 in a 743px viewport.
+      // `.g-btn` always had the correct order, which is why only this one was broken.
+      '.l-pill{all:unset;position:fixed;right:18px;bottom:18px;z-index:2147483000;cursor:pointer;' +
+        'display:inline-flex;align-items:center;gap:8px;background:#b08642;color:#fff;font-weight:700;' +
+        'font-size:14px;line-height:1;padding:12px 17px;border-radius:999px;' +
+        'box-shadow:0 6px 20px rgba(0,0,0,.22);max-width:calc(100vw - 36px);white-space:nowrap;' +
         'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}' +
+      '.l-pill.l-left{right:auto;left:18px}' +
       '.l-row{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #f0eee9}' +
       '.l-row img{width:42px;height:42px;object-fit:cover;border-radius:8px;background:#f3f3f1}' +
       '.l-row .t{flex:1;min-width:0}.l-row .t b{display:block;font-size:13px;font-weight:600;' +
@@ -684,6 +696,22 @@
     var L = function (s) { return lr.querySelector(s) }
     var pill = L('.l-pill'), lov = L('.l-ov'), lfile = L('.l-file'), lprev = L('.l-prev')
     var lgo = L('.l-go'), lcb = L('.l-consent-cb'), ldrop = L('.l-drop')
+
+    // Bottom-RIGHT is the category convention and what shoppers expect. Two collisions to avoid:
+    //   1. our own floating trigger, also bottom-right -- stack the pill above it;
+    //   2. a chat launcher the merchant already runs (Intercom, Crisp, Tawk all sit bottom-right).
+    //      We cannot see into a cross-origin chat iframe to measure it, so rather than guess,
+    //      `data-look-position="left"` on the snippet moves the pill to the other corner. One
+    //      attribute, and it is the only honest answer to a widget we cannot inspect.
+    if ((script.getAttribute('data-look-position') || '').toLowerCase() === 'left') {
+      pill.classList.add('l-left')
+    }
+    function placePill () {
+      pill.style.bottom = window.__gruhaFloatingTrigger ? '78px' : '18px'
+    }
+    placePill()
+    setTimeout(placePill, 600)            // another script tag may float its trigger after us
+    window.addEventListener('resize', placePill)
     var roomType = 'furnished', lroom = null, lmeta = null, lconsentAt = null, lastLook = null
     var lroomKey = null
     // Saved looks are product references only — no images — so they carry no retention burden.
@@ -719,13 +747,18 @@
     }
     function refresh () {
       var a = lookGet()
-      pill.style.display = a.length ? 'inline-flex' : 'none'
-      L('.l-pill-t').textContent = 'Your Look (' + a.length + ')'
+      // The pill is ALWAYS visible, including on a first ever page view. It used to be hidden
+      // until something was added, which meant the multi-product feature -- the headline one --
+      // could only be discovered by a shopper who had already used it. Empty, it reads
+      // "Your Look" and opening it explains what it is for.
+      pill.style.display = 'inline-flex'
+      L('.l-pill-t').textContent = a.length ? 'Your Look (' + a.length + ')' : 'Your Look'
       L('.l-items').innerHTML = a.length ? a.map(function (it, i) {
         return '<div class="l-row"><img src="' + (it.image_url || '') + '" alt="">' +
           '<div class="t"><b>' + (it.name || '') + '</b><span>' + money(it.price_inr) + '</span></div>' +
           '<button class="l-x" data-i="' + i + '" aria-label="Remove">×</button></div>' }).join('')
-        : '<p class="l-note">Nothing here yet. Open a product and tap “Add to Your Look”.</p>'
+        : '<p class="l-note"><b>Your Look stages several pieces in one photo of your room.</b><br>' +
+          'Open any product, tap “+ Add to Your Look”, then come back here and upload your room once.</p>'
       Array.prototype.forEach.call(lr.querySelectorAll('.l-x'), function (b) {
         b.addEventListener('click', function () {
           var arr = lookGet(); arr.splice(Number(b.getAttribute('data-i')), 1); lookSet(arr)
@@ -738,11 +771,16 @@
           cap() + ' pieces convincingly. We\'ll show your top ' + cap() + ' of ' + a.length + '.'
       } else w.style.display = 'none'
       lgo.textContent = 'See my look' + (a.length ? ' (' + Math.min(a.length, cap()) + ')' : '')
+      updL()   // removing the last item must re-disable the button, not just change its label
     }
     window.__gruhaLookRefresh = refresh
 
     function updL () {
-      if ((lroom || lroomKey) && lcb.checked) lgo.removeAttribute('disabled'); else lgo.setAttribute('disabled', '')
+      // An empty look must not be renderable. Before the pill was shown from the first page view
+      // this could not happen -- you could only reach the drawer by adding something. Now that a
+      // first-time visitor can open it with nothing in it, "See my look" has to stay disabled or
+      // it would spend a credit staging nothing.
+      if ((lroom || lroomKey) && lcb.checked && lookGet().length) lgo.removeAttribute('disabled'); else lgo.setAttribute('disabled', '')
     }
     lcb.addEventListener('change', function () {
       var ok = lcb.checked

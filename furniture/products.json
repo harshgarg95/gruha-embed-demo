@@ -1,0 +1,35 @@
+[
+ {
+  "handle": "cavallo-3-seater-sofa",
+  "name": "Cavallo 3 Seater Sofa",
+  "category": "Sofas",
+  "slot": "sofa — empty room: PASS",
+  "size": "large-floor",
+  "price_inr": 112699,
+  "image_url": "https://cdn.shopify.com/s/files/1/0683/7338/1440/files/Cavallo3SetaerSofa.jpg?v=1772798378",
+  "buy_link": "https://orangetree.in/products/cavallo-3-seater-sofa",
+  "dims": ""
+ },
+ {
+  "handle": "fou-sofa",
+  "name": "Fou 3 Seater Sofa",
+  "category": "Sofas",
+  "slot": "sofa — into a room that already has one: PASS",
+  "size": "large-floor",
+  "price_inr": 178899,
+  "image_url": "https://cdn.shopify.com/s/files/1/0683/7338/1440/files/FouSofa2.jpg?v=1771395315",
+  "buy_link": "https://orangetree.in/products/fou-sofa",
+  "dims": ""
+ },
+ {
+  "handle": "arden-accent-chair",
+  "name": "Arden Modern Accent Chair",
+  "category": "Armchairs",
+  "slot": "armchair — furnished room: PASS",
+  "size": "large-floor",
+  "price_inr": 46999,
+  "image_url": "https://cdn.shopify.com/s/files/1/0683/7338/1440/files/ArdenAccentChair.jpg?v=1773896533",
+  "buy_link": "https://orangetree.in/products/arden-accent-chair",
+  "dims": ""
+ }
+]

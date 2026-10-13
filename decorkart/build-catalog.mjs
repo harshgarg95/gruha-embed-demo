@@ -39,7 +39,12 @@ const PICKS = [
   ['cromwell-spruce-cabinet-tall',                   'Cabinets',       'tall cabinet',      'large-floor'],
   ['equine-framed-art',                              'Wall Decor',     'wall art — wall plane', 'mid'],
   ['the-estate-blue-white-hand-painted-planter-large', 'Planters',     'planter',           'mid'],
-  ['lounge-ottoman-sky-blue',                        'Furniture',      'ottoman — upholstered', 'mid'],
+  // REMOVED 13 Oct: the Lounge Ottoman is 31 x 31 x 42 cm and rendered at roughly double that,
+  // reproducibly (2/2) -- its product page showed "Dimensions: 31 cm" directly above a render that
+  // contradicted it. Scale is the thing we claim to do better than anyone, so it cannot be the
+  // first thing a prospect clicks. The Sky Blossom Garden Stool (31 x 31 x 44 cm, ceramic) covers
+  // the same slot and scaled CORRECTLY in the same test, which is also what localises the defect
+  // to soft/upholstered goods rather than to small objects in general.
   ['sky-blossom-garden-stool',                       'Ottomans & Pouffes', 'garden stool',  'mid'],
   ['royal-orbit-serving-bar-cart',                   'Tables + Storage', 'bar cart',        'mid'],
 ]

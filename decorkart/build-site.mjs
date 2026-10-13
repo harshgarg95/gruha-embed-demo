@@ -10,12 +10,25 @@
 //
 // Every page loads THE DEPLOYED widget (/v13/embed.js) and calls THE DEPLOYED endpoint. There is
 // no second render path here and no Gruha logic in this file.
-import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdirSync, rmSync, readdirSync } from 'node:fs'
 
-const here = new URL('./', import.meta.url)
+// SITE_DIR lets the SAME generator build a second storefront from a different directory, instead
+// of a copy that would drift from this one. Paths below are all relative to `here`.
+const here = process.env.SITE_DIR
+  ? new URL(`../${process.env.SITE_DIR}/`, import.meta.url)
+  : new URL('./', import.meta.url)
 const products = JSON.parse(readFileSync(new URL('./products.json', here), 'utf8'))
 
-const WIDGET = '/v13/embed.js'
+// Brand-specific strings live here so the SAME generator can build a second storefront. It does:
+// /furniture is an identical build over a different catalogue, because Decor Kart sell no seating
+// and a sofa demo still has to exist somewhere honest.
+const BASE     = process.env.SITE_BASE    || '/decorkart/'
+const BRAND    = process.env.SITE_BRAND   || 'THE DÉCOR KART'
+const SHOPHOST = process.env.SITE_SHOP    || 'thedecorkart.com'
+const NAV      = (process.env.SITE_NAV    || 'Furniture,Lighting,Décor,Mirrors').split(',')
+const INTRO    = process.env.SITE_INTRO   || ''
+
+const WIDGET = '/v14/embed.js'   // v14: the Your Look pill is fixed-positioned, bottom-right, and visible from the first page view
 const ENDPOINT = 'https://txkxblempgconaeplqde.supabase.co/functions/v1/embed-render'
 const BRAND_KEY = 'gk_demo_dkart_2f9a4e6b1c83' // origin-locked to room.gruhalabs.com, own credit + daily cap
 
@@ -79,8 +92,8 @@ nav{font-size:13px;color:var(--muted);display:flex;gap:18px;flex-wrap:wrap}
 `
 
 const BAR = `<div class="bar">
-  <div><a href="/decorkart/"><span class="logo">THE DÉCOR KART</span></a><span class="tag">GRUHA DEMO</span></div>
-  <nav><a href="/decorkart/">Shop all</a><span>Furniture</span><span>Lighting</span><span>Décor</span><span>Mirrors</span></nav>
+  <div><a href="${BASE}"><span class="logo">${BRAND}</span></a><span class="tag">GRUHA DEMO</span></div>
+  <nav><a href="${BASE}">Shop all</a>${NAV.map((n) => `<span>${n}</span>`).join('')}</nav>
 </div>`
 
 const head = (title, desc) => `<!doctype html>
@@ -102,7 +115,7 @@ const lookOnlyWidget = `<script src="${WIDGET}" data-gruha-key="${BRAND_KEY}"
 
 // ------------------------------------------------------------------ grid
 const cards = products.map((p) => `
-      <a class="card" href="/decorkart/p/${p.handle}.html">
+      <a class="card" href="${BASE}p/${p.handle}.html">
         <div class="shot"><img src="${esc(sized(p.image_url, 600))}" alt="${esc(p.name)}" loading="lazy" width="600" height="600"></div>
         <div class="cat">${esc(p.category)}</div>
         <div class="nm">${esc(p.name)}</div>
@@ -118,12 +131,13 @@ ${BAR}
 <div class="hero">
   <h1>See it in your room</h1>
   <p>Open any piece below, upload a photo of your space, and see it staged in <b>your own room</b> —
-     with the price and a link to buy. ${products.length} real products from thedecorkart.com.</p>
+     with the price and a link to buy. ${products.length} real products from ${SHOPHOST}.</p>
+  ${INTRO ? `<p style="margin-top:12px">${INTRO}</p>` : ''}
 </div>
 <div class="wrap">
   <div class="grid">${cards}
   </div>
-  <div class="foot">Real products and live prices from <b>thedecorkart.com</b> ·
+  <div class="foot">Real products and live prices from <b>${SHOPHOST}</b> ·
     one &lt;script&gt; tag per product page · renders on Gruha's server.<br>Powered by <b>Gruha</b>.</div>
 </div>
 ${lookOnlyWidget}
@@ -131,7 +145,16 @@ ${lookOnlyWidget}
 `)
 
 // ------------------------------------------------------------------ product pages
+// Rewriting products.json does not delete a page for a product that has been REMOVED, so the
+// stale file stays live and reachable by URL. Dropping the Lounge Ottoman left its page -- and
+// its oversized render -- still served. Clear the directory each build.
 mkdirSync(new URL('./p/', here), { recursive: true })
+for (const f of readdirSync(new URL('./p/', here))) {
+  if (f.endsWith('.html') && !products.some((p) => `${p.handle}.html` === f)) {
+    rmSync(new URL(`./p/${f}`, here))
+    console.log(`  removed stale page ${f}`)
+  }
+}
 for (const p of products) {
   const variantAttr = p.variants
     ? `\n  data-variants="${esc(JSON.stringify(p.variants))}"`
@@ -142,7 +165,7 @@ for (const p of products) {
   )}
 ${BAR}
 <div class="wrap">
-  <div class="crumb"><a href="/decorkart/">Shop all</a> · ${esc(p.category)}</div>
+  <div class="crumb"><a href="${BASE}">Shop all</a> · ${esc(p.category)}</div>
   <div class="pdp">
     <div class="media"><img src="${esc(sized(p.image_url, 1000))}" alt="${esc(p.name)}" width="1000" height="1000"></div>
     <div>
@@ -154,10 +177,10 @@ ${BAR}
       <div id="gslot" class="gslot"></div>
       ${p.dims ? `<div class="dims">Dimensions: ${esc(p.dims)}</div>` : ''}
       <p class="note">This is a demonstration storefront built by Gruha. “Add to cart” opens the real
-        product on thedecorkart.com.</p>
+        product on ${SHOPHOST}.</p>
     </div>
   </div>
-  <div class="foot">Powered by <b>Gruha</b> · <a href="/decorkart/">back to all ${products.length} pieces</a></div>
+  <div class="foot">Powered by <b>Gruha</b> · <a href="${BASE}">back to all ${products.length} pieces</a></div>
 </div>
 <script src="${WIDGET}" data-gruha-key="${BRAND_KEY}"
   data-endpoint="${ENDPOINT}"
@@ -170,4 +193,4 @@ ${BAR}
 `)
 }
 
-console.log(`built /decorkart/index.html + ${products.length} product pages`)
+console.log(`built ${BASE}index.html + ${products.length} product pages`)
