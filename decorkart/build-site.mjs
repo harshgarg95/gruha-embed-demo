@@ -20,7 +20,10 @@ const ENDPOINT = 'https://txkxblempgconaeplqde.supabase.co/functions/v1/embed-re
 const BRAND_KEY = 'gk_demo_dkart_2f9a4e6b1c83' // origin-locked to room.gruhalabs.com, own credit + daily cap
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-const inr = (n) => '₹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 })
+// Show paise only when the real price has them (the Lounge Ottoman is ₹2,725.80, and rounding it
+// to ₹2,726 on a page branded with the brand's own name is a small lie about their pricing).
+const inr = (n) => '₹' + Number(n).toLocaleString('en-IN',
+  Number.isInteger(Number(n)) ? { maximumFractionDigits: 0 } : { minimumFractionDigits: 2 })
 
 const CSS = `
 :root{--ink:#241f1b;--muted:#8a827a;--line:#ece7df;--bg:#faf7f2;--gold:#b08642;--card:#fff}

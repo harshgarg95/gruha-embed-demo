@@ -51,10 +51,16 @@ const SEPARATE_COLOURWAYS = {
   'charming-duck-tabletop-decor-blue': ['blue', 'green', 'pink', 'purple'],
 }
 
+// "Dimensions: 60 cm x 4 cm x 150 cm (LxWxH) Material: ..." -> "60 cm x 4 cm x 150 cm".
+// Stopping at the first unit (an earlier version of this) truncated that to "60 cm", which read on
+// the page as a mirror 60 cm tall. Run to the "(LxWxH)" note or the next field label instead, and
+// keep the result only if it actually looks like a measurement.
 const dimsOf = (html) => {
   const m = html.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ')
-    .match(/Dimensions?\s*:?\s*([0-9][^A-Za-z]{2,60}(?:cm|mm|inch|in)\b[^A-Z(]{0,16})/i)
-  return m ? m[1].replace(/\s+/g, ' ').trim().replace(/[\s,]+$/, '') : ''
+    .match(/Dimensions?\s*:?\s*([0-9][^(]{2,78}?)\s*(?:\(|Material|Weight|Colour|Color|Care|$)/i)
+  if (!m) return ''
+  const d = m[1].replace(/\s+/g, ' ').trim().replace(/[\s,.]+$/, '')
+  return /\d/.test(d) && /(cm|mm|inch|in|ft|")\b/i.test(d) ? d : ''
 }
 
 async function fetchProduct(handle) {
