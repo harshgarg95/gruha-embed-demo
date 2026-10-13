@@ -20,6 +20,15 @@ const ENDPOINT = 'https://txkxblempgconaeplqde.supabase.co/functions/v1/embed-re
 const BRAND_KEY = 'gk_demo_dkart_2f9a4e6b1c83' // origin-locked to room.gruhalabs.com, own credit + daily cap
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+
+// Décor Kart's catalogue images are 1000-1400px and the grid was pulling 1.3 MB of them to draw
+// eighteen 320px thumbnails. Shopify's CDN resizes on demand, so ask it for the size actually
+// being displayed — this is a demo people will open on a phone, on mobile data.
+//
+// Only what is DISPLAYED is resized. `data-product-image` keeps the full-resolution URL, because
+// that is the reference image the render server fetches and shrinking it would cost product
+// fidelity to save bytes we are not sending to the shopper anyway.
+const sized = (url, w) => (/cdn\.shopify\.com/.test(url) ? `${url}${url.includes('?') ? '&' : '?'}width=${w}` : url)
 // Show paise only when the real price has them (the Lounge Ottoman is ₹2,725.80, and rounding it
 // to ₹2,726 on a page branded with the brand's own name is a small lie about their pricing).
 const inr = (n) => '₹' + Number(n).toLocaleString('en-IN',
@@ -94,7 +103,7 @@ const lookOnlyWidget = `<script src="${WIDGET}" data-gruha-key="${BRAND_KEY}"
 // ------------------------------------------------------------------ grid
 const cards = products.map((p) => `
       <a class="card" href="/decorkart/p/${p.handle}.html">
-        <div class="shot"><img src="${esc(p.image_url)}" alt="${esc(p.name)}" loading="lazy"></div>
+        <div class="shot"><img src="${esc(sized(p.image_url, 600))}" alt="${esc(p.name)}" loading="lazy" width="600" height="600"></div>
         <div class="cat">${esc(p.category)}</div>
         <div class="nm">${esc(p.name)}</div>
         <div class="pr">${inr(p.price_inr)}</div>
@@ -135,7 +144,7 @@ ${BAR}
 <div class="wrap">
   <div class="crumb"><a href="/decorkart/">Shop all</a> · ${esc(p.category)}</div>
   <div class="pdp">
-    <div class="media"><img src="${esc(p.image_url)}" alt="${esc(p.name)}"></div>
+    <div class="media"><img src="${esc(sized(p.image_url, 1000))}" alt="${esc(p.name)}" width="1000" height="1000"></div>
     <div>
       <div class="cat">${esc(p.category)}</div>
       <h1>${esc(p.name)}</h1>
