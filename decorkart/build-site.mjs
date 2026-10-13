@@ -28,7 +28,7 @@ const SHOPHOST = process.env.SITE_SHOP    || 'thedecorkart.com'
 const NAV      = (process.env.SITE_NAV    || 'Furniture,Lighting,Décor,Mirrors').split(',')
 const INTRO    = process.env.SITE_INTRO   || ''
 
-const WIDGET = '/v14/embed.js'   // v14: the Your Look pill is fixed-positioned, bottom-right, and visible from the first page view
+const WIDGET = '/v15/embed.js'   // v15: the look result finally has Buy (per line) and Download, and '+ Add another product' goes somewhere
 const ENDPOINT = 'https://txkxblempgconaeplqde.supabase.co/functions/v1/embed-render'
 const BRAND_KEY = 'gk_demo_dkart_2f9a4e6b1c83' // origin-locked to room.gruhalabs.com, own credit + daily cap
 

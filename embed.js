@@ -402,7 +402,7 @@
   $('.g-phone').addEventListener('click', function () {
     startHandoff({ key: cfg.key, currency: CURRENCY, items: [product] }, $, function (imgUrl) {
       $('.g-res img').src = imgUrl
-      wireDownload(imgUrl, product.name)
+      wireDownload($('.g-dl'), imgUrl, product.name)
       $('.g-quote').innerHTML = '<div class="g-row"><span>' + product.name + ' × 1</span><span>' +
         money(product.price_inr) + '</span></div><div class="g-tot"><span>Total</span><span>' +
         money(product.price_inr) + '</span></div>'
@@ -419,8 +419,10 @@
   // hand-off). Browsers IGNORE the download attribute on a cross-origin href and navigate
   // instead, so that case is fetched to a blob first. The shopper is on the brand's own site,
   // not in a sandboxed frame, so a plain anchor is all this needs.
-  function wireDownload(url, prodName) {
-    var a = $('.g-dl')
+  // Takes the anchor rather than finding it, because the LOOK panel is a different shadow root
+  // and used to have no Download button at all -- Flow A had Buy/Share/Download while a look only
+  // ever offered Share, which is what the client hit.
+  function wireDownload(a, url, prodName) {
     if (!a) return
     var safe = String(prodName || 'room').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48)
     var name = 'gruha-' + (safe || 'room') + '.jpg'
@@ -440,7 +442,7 @@
   function renderResult(j, shown) {
     lastRenderUrl = j.renderDataUrl
     $('.g-res img').src = j.renderDataUrl
-    wireDownload(j.renderDataUrl, (shown && shown.name) || product.name)
+    wireDownload($('.g-dl'), j.renderDataUrl, (shown && shown.name) || product.name)
     var q = j.quote || { items: [], total_inr: product.price_inr }
     var html = ''
     ;(q.items || []).forEach(function (it) {
@@ -644,6 +646,8 @@
         'box-shadow:0 6px 20px rgba(0,0,0,.22);max-width:calc(100vw - 36px);white-space:nowrap;' +
         'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}' +
       '.l-pill.l-left{right:auto;left:18px}' +
+      '.l-buy{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;background:#1f2d2b;' +
+        'color:#fff;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap;vertical-align:1px}' +
       '.l-row{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #f0eee9}' +
       '.l-row img{width:42px;height:42px;object-fit:cover;border-radius:8px;background:#f3f3f1}' +
       '.l-row .t{flex:1;min-width:0}.l-row .t b{display:block;font-size:13px;font-weight:600;' +
@@ -686,7 +690,8 @@
             '<div class="l-prog">Staging your room…</div></div></div>' +
           '<div class="g-step l-step-res" style="display:none">' +
             '<div class="g-res"><img alt="your look"></div><div class="g-quote l-quote"></div>' +
-            '<div class="g-actions"><button class="g-wa l-wa">Share on WhatsApp</button></div>' +
+            '<div class="g-actions"><button class="g-wa l-wa">Share on WhatsApp</button>' +
+              '<a class="g-dl l-dl" download>Download</a></div>' +
             '<button class="g-link l-again">↻ Try another room</button></div>' +
           '<div class="g-step l-step-err" style="display:none"><div class="g-err l-err"></div>' +
             '<button class="g-cta l-retry">Try again</button></div>' +
@@ -814,7 +819,29 @@
     })
     L('.l-close').addEventListener('click', function () { lov.classList.remove('open') })
     lov.addEventListener('click', function (e) { if (e.target === lov) lov.classList.remove('open') })
-    L('.l-more').addEventListener('click', function () { lov.classList.remove('open') })
+    // "+ Add another product" used to ONLY close the drawer -- no navigation, no picker, no
+    // network call (the edge logs for the client's session show zero POSTs between 17:01 and
+    // 17:05, just the panel re-initialising). It was a no-op with no destination.
+    //
+    // The widget cannot know a merchant's catalogue, so it cannot show a product picker
+    // generically. What it CAN do is send the shopper back to where products are. The look
+    // itself is in localStorage, so it survives the navigation untouched and the pill shows the
+    // count on the page they land on.
+    L('.l-more').addEventListener('click', function () {
+      lov.classList.remove('open')
+      var dest = script.getAttribute('data-shop-url')
+      if (!dest) {
+        var path = location.pathname
+        // A product page on either of the two shapes we actually ship on: Shopify's /products/
+        // and our own /<store>/p/<handle>.html. Step up to the listing that contains it.
+        if (/\/products\//.test(path)) dest = '/collections/all'
+        else if (/\/p\/[^/]+\.html?$/.test(path)) dest = path.replace(/\/p\/[^/]+\.html?$/, '/')
+        else dest = '/'
+      }
+      // Never navigate away from the page we are already on -- that would look like the same
+      // dead button it used to be.
+      if (dest && dest !== location.pathname) location.href = dest
+    })
     L('.l-retry').addEventListener('click', function () { lshow('upload') })
     L('.l-again').addEventListener('click', function () { lroom = null; lroomKey = null; lprev.style.display = 'none'; updL(); lshow('upload') })
     ;[['furn', 'furnished'], ['empty', 'empty']].forEach(function (pair) {
@@ -863,11 +890,17 @@
     function finish (img, items, total) {
       lastLook = img
       L('.l-step-res').querySelector('img').src = img
+      // Download the COMPOSED look, exactly as Flow A downloads a single render. The look's
+      // result lives in a different shadow root, which is why it was missed when Download was
+      // added to the product panel.
+      wireDownload(L('.l-dl'), img, 'your-look')
       var sum = 0
       var rows = items.map(function (it) {
         sum += Number(it.price_inr) || 0
-        var nm = it.buy_link ? '<a href="' + it.buy_link + '" target="_blank" rel="noopener">' + it.name + '</a>' : it.name
-        return '<div class="g-row"><span>' + nm + ' × 1</span><span>' + money(it.price_inr) + '</span></div>'
+        var buy = it.buy_link
+          ? '<a class="l-buy" href="' + it.buy_link + '" target="_blank" rel="noopener">Buy ↗</a>' : ''
+        return '<div class="g-row"><span>' + it.name + ' × 1' + buy + '</span><span>' +
+          money(it.price_inr) + '</span></div>'
       }).join('')
       if (total > items.length) {
         rows += '<div class="g-row"><span style="color:#8a6d1f">Showing your top ' + items.length +
