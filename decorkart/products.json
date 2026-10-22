@@ -1,215 +1,232 @@
 [
- {
-  "handle": "the-versailles-distressed-baroque-floor-mirror",
-  "name": "The Versailles Distressed Baroque Floor Mirror",
-  "category": "Mirrors",
-  "slot": "floor mirror",
-  "size": "large-floor",
-  "price_inr": 24140,
-  "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/JHN13_12__converted.webp?v=1791007584",
-  "buy_link": "https://thedecorkart.com/products/the-versailles-distressed-baroque-floor-mirror",
-  "dims": "60 cm x 4 cm x 150 cm"
- },
- {
-  "handle": "provence-scrollwork-console-table",
-  "name": "Provence Scrollwork Console Table",
-  "category": "Console Tables",
-  "slot": "console",
-  "size": "large-floor",
-  "price_inr": 32300,
-  "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/JHN13_16__converted.webp?v=1791007234",
-  "buy_link": "https://thedecorkart.com/products/provence-scrollwork-console-table",
-  "dims": "138 cm x 39 cm x 77 cm"
- },
- {
-  "handle": "acacia-distressed-finish-console",
-  "name": "Acacia Distressed Finish Console",
-  "category": "Console Tables",
-  "slot": "console",
-  "size": "large-floor",
-  "price_inr": 24310,
-  "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/furniture_1__converted.webp?v=1790591052",
-  "buy_link": "https://thedecorkart.com/products/acacia-distressed-finish-console",
-  "dims": "106 cm x 38 cm x 73 cm"
- },
- {
-  "handle": "industrial-gare-clock-center-table",
-  "name": "Industrial Gare Clock Center Table",
-  "category": "Centre Tables",
-  "slot": "centre table",
-  "size": "mid",
-  "price_inr": 73100,
-  "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/12_329.png?v=1790152136",
-  "buy_link": "https://thedecorkart.com/products/industrial-gare-clock-center-table",
-  "dims": "110 x 110 x 40 cm"
- },
- {
-  "handle": "yorkshire-victorian-ornamental-side-table",
-  "name": "'Yorkshire' Victorian Ornamental Side Table",
-  "category": "Side Tables",
-  "slot": "side table",
-  "size": "mid",
-  "price_inr": 49300,
-  "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/009A9818_9b01724a-6344-43d8-b38c-26435dc0fd4b.jpg?v=1744625655",
-  "buy_link": "https://thedecorkart.com/products/yorkshire-victorian-ornamental-side-table",
-  "dims": "34 cm x 34 cm x 74 cm"
- },
- {
-  "handle": "ornate-floral-scroll-small-ceramic-stool",
-  "name": "Ornate Floral Scroll Small Ceramic Stool",
-  "category": "Stools",
-  "slot": "ceramic stool",
-  "size": "mid",
-  "price_inr": 6080,
-  "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/1C3A9941_7b73c810-e063-432d-a36f-e0685a7af784.jpg?v=1791463158",
-  "buy_link": "https://thedecorkart.com/products/ornate-floral-scroll-small-ceramic-stool",
-  "dims": "23 cm x 23 cm x 21 cm"
- },
- {
-  "handle": "midnight-regent-crystal-table-lamp",
-  "name": "Midnight Regent Crystal Table Lamp",
-  "category": "Table Lamps",
-  "slot": "table lamp",
-  "size": "small-decor",
-  "price_inr": 8820,
-  "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/1C3A2475.jpg?v=1791358543",
-  "buy_link": "https://thedecorkart.com/products/midnight-regent-crystal-table-lamp",
-  "dims": ""
- },
- {
-  "handle": "fluted-classic-table-lamp",
-  "name": "Fluted Classic Table Lamp",
-  "category": "Table Lamps",
-  "slot": "table lamp",
-  "size": "small-decor",
-  "price_inr": 5026,
-  "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/1C3A2455.jpg?v=1791356591",
-  "buy_link": "https://thedecorkart.com/products/fluted-classic-table-lamp",
-  "dims": ""
- },
- {
-  "handle": "blue-chinoiserie-scalloped-fruit-bowl",
-  "name": "Blue Chinoiserie Scalloped Fruit Bowl",
-  "category": "Decorative Bowls",
-  "slot": "tabletop bowl",
-  "size": "small-decor",
-  "price_inr": 4480,
-  "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/Blue-and-WhiteBowlwithTropicalFruits_1__converted.webp?v=1791636897",
-  "buy_link": "https://thedecorkart.com/products/blue-chinoiserie-scalloped-fruit-bowl",
-  "dims": "30 cm x 30 cm x 16 cm"
- },
- {
-  "handle": "charming-duck-tabletop-decor-blue",
-  "name": "Charming Duck Tabletop Decor",
-  "category": "Table Top Decor",
-  "slot": "tabletop · 4 finishes",
-  "size": "small-decor",
-  "price_inr": 476,
-  "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/2_24_e26e70ad-2f91-4ab7-a094-6f1888baebfe.png?v=1789971306",
-  "buy_link": "https://thedecorkart.com/products/charming-duck-tabletop-decor-blue",
-  "dims": "5 cm × 5 cm × 8.5 cm",
-  "variants": [
-   {
-    "label": "Blue",
+  {
+    "handle": "acacia-distressed-finish-console",
+    "name": "Acacia Distressed Finish Console",
+    "category": "Console Tables",
+    "slot": "console",
+    "size": "large-floor",
+    "price_inr": 24310,
+    "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/furniture_1__converted.webp?v=1790591052",
+    "buy_link": "https://thedecorkart.com/products/acacia-distressed-finish-console",
+    "dims": "106 cm x 38 cm x 73 cm",
+    "rank": 1
+  },
+  {
+    "handle": "provence-scrollwork-console-table",
+    "name": "Provence Scrollwork Console Table",
+    "category": "Console Tables",
+    "slot": "console",
+    "size": "large-floor",
+    "price_inr": 32300,
+    "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/JHN13_16__converted.webp?v=1791007234",
+    "buy_link": "https://thedecorkart.com/products/provence-scrollwork-console-table",
+    "dims": "138 cm x 39 cm x 77 cm",
+    "rank": 2
+  },
+  {
+    "handle": "cromwell-spruce-cabinet-tall",
+    "name": "'Cromwell' Spruce Cabinet - Tall",
+    "category": "Cabinets",
+    "slot": "tall cabinet",
+    "size": "large-floor",
+    "price_inr": 19680,
+    "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/Untitled-5_b1568356-2a7d-4d9f-a116-0e36dd3a5443.jpg?v=1745992907",
+    "buy_link": "https://thedecorkart.com/products/cromwell-spruce-cabinet-tall",
+    "dims": "36 cm x 80 cm x 101 cm",
+    "rank": 3
+  },
+  {
+    "handle": "vintage-bohemian-chic-round-floor-rug",
+    "name": "Vintage Bohemian Chic Round Floor Rug",
+    "category": "Rugs",
+    "slot": "rug — floor plane",
+    "size": "large-floor",
+    "price_inr": 2880,
+    "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/009A2706.jpg?v=1751366928",
+    "buy_link": "https://thedecorkart.com/products/vintage-bohemian-chic-round-floor-rug",
+    "dims": "120 cm x 120 cm x 1.5 cm",
+    "rank": 4
+  },
+  {
+    "handle": "equine-framed-art",
+    "name": "'Equine' Sandblast Framed Wall Art",
+    "category": "Wall Decor",
+    "slot": "wall art — wall plane",
+    "size": "mid",
+    "price_inr": 13200,
+    "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/zzz_87.webp?v=1782989988",
+    "buy_link": "https://thedecorkart.com/products/equine-framed-art",
+    "dims": "",
+    "rank": 5
+  },
+  {
+    "handle": "sky-blossom-garden-stool",
+    "name": "Sky Blossom Garden Stool",
+    "category": "Ottomans & Pouffes",
+    "slot": "garden stool",
+    "size": "mid",
+    "price_inr": 7680,
+    "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/1100_529.webp?v=1781948144",
+    "buy_link": "https://thedecorkart.com/products/sky-blossom-garden-stool",
+    "dims": "31 cm x 31 cm x 44 cm",
+    "rank": 6
+  },
+  {
+    "handle": "the-estate-blue-white-hand-painted-planter-large",
+    "name": "The Estate Blue & White Hand-Painted Planter - Large",
+    "category": "Planters",
+    "slot": "planter",
+    "size": "mid",
+    "price_inr": 18080,
+    "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/1C3A9908_c82ac194-a893-4ebd-84f5-b77ea3d7e8de.jpg?v=1791356468",
+    "buy_link": "https://thedecorkart.com/products/the-estate-blue-white-hand-painted-planter-large",
+    "dims": "",
+    "rank": 7
+  },
+  {
+    "handle": "royal-orbit-serving-bar-cart",
+    "name": "Royal Orbit Serving Bar Cart",
+    "category": "Tables + Storage",
+    "slot": "bar cart",
+    "size": "mid",
+    "price_inr": 12410,
+    "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/furniture_8.webp?v=1786696560",
+    "buy_link": "https://thedecorkart.com/products/royal-orbit-serving-bar-cart",
+    "dims": "58 cm x 58 cm x 74 cm",
+    "rank": 8
+  },
+  {
+    "handle": "yorkshire-victorian-ornamental-side-table",
+    "name": "'Yorkshire' Victorian Ornamental Side Table",
+    "category": "Side Tables",
+    "slot": "side table",
+    "size": "mid",
+    "price_inr": 49300,
+    "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/009A9818_9b01724a-6344-43d8-b38c-26435dc0fd4b.jpg?v=1744625655",
+    "buy_link": "https://thedecorkart.com/products/yorkshire-victorian-ornamental-side-table",
+    "dims": "34 cm x 34 cm x 74 cm",
+    "rank": 9
+  },
+  {
+    "handle": "ornate-floral-scroll-small-ceramic-stool",
+    "name": "Ornate Floral Scroll Small Ceramic Stool",
+    "category": "Stools",
+    "slot": "ceramic stool",
+    "size": "mid",
+    "price_inr": 6080,
+    "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/1C3A9941_7b73c810-e063-432d-a36f-e0685a7af784.jpg?v=1791463158",
+    "buy_link": "https://thedecorkart.com/products/ornate-floral-scroll-small-ceramic-stool",
+    "dims": "23 cm x 23 cm x 21 cm",
+    "rank": 10
+  },
+  {
+    "handle": "the-versailles-distressed-baroque-floor-mirror",
+    "name": "The Versailles Distressed Baroque Floor Mirror",
+    "category": "Mirrors",
+    "slot": "floor mirror",
+    "size": "large-floor",
+    "price_inr": 24140,
+    "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/JHN13_12__converted.webp?v=1791007584",
+    "buy_link": "https://thedecorkart.com/products/the-versailles-distressed-baroque-floor-mirror",
+    "dims": "60 cm x 4 cm x 150 cm",
+    "rank": 11
+  },
+  {
+    "handle": "industrial-gare-clock-center-table",
+    "name": "Industrial Gare Clock Center Table",
+    "category": "Centre Tables",
+    "slot": "centre table",
+    "size": "mid",
+    "price_inr": 73100,
+    "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/12_329.png?v=1790152136",
+    "buy_link": "https://thedecorkart.com/products/industrial-gare-clock-center-table",
+    "dims": "110 x 110 x 40 cm",
+    "rank": 12
+  },
+  {
+    "handle": "botanical-nouveau-tiffany-floor-lamp",
+    "name": "Botanical Nouveau Tiffany Floor Lamp",
+    "category": "Floor Lamps",
+    "slot": "floor lamp — tall, self-lit",
+    "size": "large-floor",
+    "price_inr": 40800,
+    "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/7_237d0373-362b-4e3e-8e95-49e2413c48bf.webp?v=1790577566",
+    "buy_link": "https://thedecorkart.com/products/botanical-nouveau-tiffany-floor-lamp",
+    "dims": "45 cm x 45 cm x 180 cm",
+    "rank": 13
+  },
+  {
+    "handle": "midnight-regent-crystal-table-lamp",
+    "name": "Midnight Regent Crystal Table Lamp",
+    "category": "Table Lamps",
+    "slot": "table lamp",
+    "size": "small-decor",
+    "price_inr": 8820,
+    "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/1C3A2475.jpg?v=1791358543",
+    "buy_link": "https://thedecorkart.com/products/midnight-regent-crystal-table-lamp",
+    "dims": "",
+    "rank": 14
+  },
+  {
+    "handle": "fluted-classic-table-lamp",
+    "name": "Fluted Classic Table Lamp",
+    "category": "Table Lamps",
+    "slot": "table lamp",
+    "size": "small-decor",
+    "price_inr": 5026,
+    "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/1C3A2455.jpg?v=1791356591",
+    "buy_link": "https://thedecorkart.com/products/fluted-classic-table-lamp",
+    "dims": "",
+    "rank": 15
+  },
+  {
+    "handle": "blue-chinoiserie-scalloped-fruit-bowl",
+    "name": "Blue Chinoiserie Scalloped Fruit Bowl",
+    "category": "Decorative Bowls",
+    "slot": "tabletop bowl",
+    "size": "small-decor",
+    "price_inr": 4480,
+    "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/Blue-and-WhiteBowlwithTropicalFruits_1__converted.webp?v=1791636897",
+    "buy_link": "https://thedecorkart.com/products/blue-chinoiserie-scalloped-fruit-bowl",
+    "dims": "30 cm x 30 cm x 16 cm",
+    "rank": 16
+  },
+  {
+    "handle": "charming-duck-tabletop-decor-blue",
+    "name": "Charming Duck Tabletop Decor",
+    "category": "Table Top Decor",
+    "slot": "tabletop · 4 finishes",
+    "size": "small-decor",
     "price_inr": 476,
     "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/2_24_e26e70ad-2f91-4ab7-a094-6f1888baebfe.png?v=1789971306",
-    "buy_link": "https://thedecorkart.com/products/charming-duck-tabletop-decor-blue"
-   },
-   {
-    "label": "Green",
-    "price_inr": 476,
-    "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/2_23_36598153-0dd5-428e-8386-a366ac0092b8.png?v=1789971547",
-    "buy_link": "https://thedecorkart.com/products/charming-duck-tabletop-decor-green"
-   },
-   {
-    "label": "Pink",
-    "price_inr": 476,
-    "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/2_26_bdbc1702-80dc-432f-b8ee-e6a96fd46c46.png?v=1789971558",
-    "buy_link": "https://thedecorkart.com/products/charming-duck-tabletop-decor-pink"
-   },
-   {
-    "label": "Purple",
-    "price_inr": 476,
-    "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/2_16_1035d3c6-9e56-441d-aa66-0c94ce6303de.png?v=1789971072",
-    "buy_link": "https://thedecorkart.com/products/charming-duck-tabletop-decor-purple"
-   }
-  ]
- },
- {
-  "handle": "vintage-bohemian-chic-round-floor-rug",
-  "name": "Vintage Bohemian Chic Round Floor Rug",
-  "category": "Rugs",
-  "slot": "rug — floor plane",
-  "size": "large-floor",
-  "price_inr": 2880,
-  "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/009A2706.jpg?v=1751366928",
-  "buy_link": "https://thedecorkart.com/products/vintage-bohemian-chic-round-floor-rug",
-  "dims": "120 cm x 120 cm x 1.5 cm"
- },
- {
-  "handle": "botanical-nouveau-tiffany-floor-lamp",
-  "name": "Botanical Nouveau Tiffany Floor Lamp",
-  "category": "Floor Lamps",
-  "slot": "floor lamp — tall, self-lit",
-  "size": "large-floor",
-  "price_inr": 40800,
-  "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/7_237d0373-362b-4e3e-8e95-49e2413c48bf.webp?v=1790577566",
-  "buy_link": "https://thedecorkart.com/products/botanical-nouveau-tiffany-floor-lamp",
-  "dims": "45 cm x 45 cm x 180 cm"
- },
- {
-  "handle": "cromwell-spruce-cabinet-tall",
-  "name": "'Cromwell' Spruce Cabinet - Tall",
-  "category": "Cabinets",
-  "slot": "tall cabinet",
-  "size": "large-floor",
-  "price_inr": 19680,
-  "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/Untitled-5_b1568356-2a7d-4d9f-a116-0e36dd3a5443.jpg?v=1745992907",
-  "buy_link": "https://thedecorkart.com/products/cromwell-spruce-cabinet-tall",
-  "dims": "36 cm x 80 cm x 101 cm"
- },
- {
-  "handle": "equine-framed-art",
-  "name": "'Equine' Sandblast Framed Wall Art",
-  "category": "Wall Decor",
-  "slot": "wall art — wall plane",
-  "size": "mid",
-  "price_inr": 13200,
-  "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/zzz_87.webp?v=1782989988",
-  "buy_link": "https://thedecorkart.com/products/equine-framed-art",
-  "dims": ""
- },
- {
-  "handle": "the-estate-blue-white-hand-painted-planter-large",
-  "name": "The Estate Blue & White Hand-Painted Planter - Large",
-  "category": "Planters",
-  "slot": "planter",
-  "size": "mid",
-  "price_inr": 18080,
-  "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/1C3A9908_c82ac194-a893-4ebd-84f5-b77ea3d7e8de.jpg?v=1791356468",
-  "buy_link": "https://thedecorkart.com/products/the-estate-blue-white-hand-painted-planter-large",
-  "dims": ""
- },
- {
-  "handle": "sky-blossom-garden-stool",
-  "name": "Sky Blossom Garden Stool",
-  "category": "Ottomans & Pouffes",
-  "slot": "garden stool",
-  "size": "mid",
-  "price_inr": 7680,
-  "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/1100_529.webp?v=1781948144",
-  "buy_link": "https://thedecorkart.com/products/sky-blossom-garden-stool",
-  "dims": "31 cm x 31 cm x 44 cm"
- },
- {
-  "handle": "royal-orbit-serving-bar-cart",
-  "name": "Royal Orbit Serving Bar Cart",
-  "category": "Tables + Storage",
-  "slot": "bar cart",
-  "size": "mid",
-  "price_inr": 12410,
-  "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/furniture_8.webp?v=1786696560",
-  "buy_link": "https://thedecorkart.com/products/royal-orbit-serving-bar-cart",
-  "dims": "58 cm x 58 cm x 74 cm"
- }
+    "buy_link": "https://thedecorkart.com/products/charming-duck-tabletop-decor-blue",
+    "dims": "5 cm × 5 cm × 8.5 cm",
+    "variants": [
+      {
+        "label": "Blue",
+        "price_inr": 476,
+        "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/2_24_e26e70ad-2f91-4ab7-a094-6f1888baebfe.png?v=1789971306",
+        "buy_link": "https://thedecorkart.com/products/charming-duck-tabletop-decor-blue"
+      },
+      {
+        "label": "Green",
+        "price_inr": 476,
+        "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/2_23_36598153-0dd5-428e-8386-a366ac0092b8.png?v=1789971547",
+        "buy_link": "https://thedecorkart.com/products/charming-duck-tabletop-decor-green"
+      },
+      {
+        "label": "Pink",
+        "price_inr": 476,
+        "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/2_26_bdbc1702-80dc-432f-b8ee-e6a96fd46c46.png?v=1789971558",
+        "buy_link": "https://thedecorkart.com/products/charming-duck-tabletop-decor-pink"
+      },
+      {
+        "label": "Purple",
+        "price_inr": 476,
+        "image_url": "https://cdn.shopify.com/s/files/1/0962/2574/files/2_16_1035d3c6-9e56-441d-aa66-0c94ce6303de.png?v=1789971072",
+        "buy_link": "https://thedecorkart.com/products/charming-duck-tabletop-decor-purple"
+      }
+    ],
+    "rank": 17
+  }
 ]

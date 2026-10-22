@@ -18,6 +18,10 @@ const here = process.env.SITE_DIR
   ? new URL(`../${process.env.SITE_DIR}/`, import.meta.url)
   : new URL('./', import.meta.url)
 const products = JSON.parse(readFileSync(new URL('./products.json', here), 'utf8'))
+// Display order is data, not array position: products.json carries an explicit `rank` (see
+// reorder.mjs). Anything without one keeps its file order, after the ranked items.
+  .map((p, i) => ({ ...p, _i: i }))
+  .sort((a, b) => (a.rank ?? 1e9) - (b.rank ?? 1e9) || a._i - b._i)
 
 // Brand-specific strings live here so the SAME generator can build a second storefront. It does:
 // /furniture is an identical build over a different catalogue, because Decor Kart sell no seating
