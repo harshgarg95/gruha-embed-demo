@@ -34,6 +34,13 @@ for (const p of products.sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99))) {
   const ok = s === 200
   if (!ok) dead.push([p.name, 'buy_link', s])
   console.log(`  ${String(p.rank ?? '-').padStart(2)}  ${ok ? 'OK  ' : String(s).padEnd(4)}  ${p.name}${imgNote}`)
+  // Colourway variants carry their OWN buy links and they go dead independently. Checking only
+  // the top-level link reported "13/13 clean" on 25 Oct while the Pink duck was a live 404.
+  for (const v of p.variants ?? []) {
+    const vs = await head(v.buy_link)
+    if (vs !== 200) dead.push([`${p.name} — ${v.label}`, 'variant buy_link', vs])
+    console.log(`       ${vs === 200 ? 'OK  ' : String(vs).padEnd(4)}  └ ${v.label}`)
+  }
 }
 
 console.log()
