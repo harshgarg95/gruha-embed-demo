@@ -191,7 +191,8 @@ ${BAR}
   data-product-name="${esc(p.name)}"
   data-product-price="${p.price_inr}"
   data-product-image="${esc(p.image_url)}"
-  data-product-buylink="${esc(p.buy_link)}"${variantAttr}
+  data-product-buylink="${esc(p.buy_link)}"
+  data-product-dims="${esc(p.dims || '')}"${variantAttr}
   data-mount="#gslot" data-label="See it in your room" data-currency="INR" async></script>
 </body></html>
 `)

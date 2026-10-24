@@ -13,6 +13,7 @@
  *           data-product-price="263999"
  *           data-product-image="https://.../sofa.jpg"
  *           data-product-buylink="https://brand.com/products/nira"
+ *           data-product-dims="213 cm x 95 cm x 78 cm"   <-- width x depth x height; drives scale
  *           data-mount="#gruha-btn"   (optional; omit for a floating button)
  *           async></script>
  * Or set window.GruhaEmbed = { product: {...} } before load for dynamic product pages.
@@ -33,6 +34,10 @@
     price_inr: Number(script.getAttribute('data-product-price') || 0),
     image_url: script.getAttribute('data-product-image') || '',
     buy_link: script.getAttribute('data-product-buylink') || '',
+    // Z1, 25 Oct: the server has expected `product.dims` since the C1 fix and the client has NEVER
+    // sent it, so every scale cue in production ran on an empty string and the size gate saw 0 cm.
+    // The fix was made on one side only; the assertion for it lives on the COMPOSED REQUEST.
+    dims: script.getAttribute('data-product-dims') || '',
   }
   if (!cfg.key || !cfg.endpoint) { console.warn('[Gruha] missing data-gruha-key or data-endpoint'); return }
   // A product is OPTIONAL: on non-product pages the script still loads so the "Your Look" pill
@@ -135,6 +140,12 @@
   .g-qr{background:#fff;border:1px solid #e9e4dc;border-radius:12px;padding:10px;display:inline-block;margin:6px 0}\
   .g-qr svg{width:148px;height:148px;display:block}\
   .g-hand-s{font-size:12px;color:#8a938f}\
+  .g-photowarn{font-size:12px;color:#8a6d1f;background:#fdf6e6;border:1px solid #f0e2bd;\
+    border-radius:10px;padding:10px 12px;margin-top:10px;line-height:1.5;display:none}\
+  .g-photowarn b{display:block;margin-bottom:4px;color:#7a5f14}\
+  .g-photowarn ul{margin:0 0 8px;padding-left:16px}\
+  .g-anyway{all:unset;cursor:pointer;font-size:12px;font-weight:700;color:#1f2d2b;\
+    text-decoration:underline}\
   .g-muted{font-size:12px;color:#8a938f;text-align:center;margin-top:12px}\
   .g-muted a{color:#8a938f}\
   .g-spin{text-align:center;padding:26px 10px;color:#445}\
@@ -157,6 +168,12 @@
   .g-tips{background:#f7f9f8;border:1px solid #e7ecea;border-radius:12px;padding:10px 12px;margin:0 0 12px}\
   .g-tips-t{font-size:12px;font-weight:700;color:#1f2d2b;margin-bottom:8px;letter-spacing:.01em}\
   .g-tips-g{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}\
+  .g-ex{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 12px}\
+  .g-ex figure{margin:0}\
+  .g-ex img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;display:block;background:#f1ece4}\
+  .g-ex figcaption{font-size:11.5px;line-height:1.3;margin-top:5px;color:#4a5351}\
+  .g-ex figcaption.ok{color:#2c6e49}\
+  .g-ex figcaption.no{color:#b4231b}\
   .g-tip{display:flex;gap:7px;align-items:flex-start;font-size:12px;line-height:1.35;color:#4a5351}\
   .g-tip svg{flex:0 0 auto;width:26px;height:26px;margin-top:-1px}\
   .g-tip.no{color:#8a5a55}\
@@ -178,17 +195,21 @@
               'to be deleted. <a href="' + PRIVACY_URL + '" target="_blank" rel="noopener">Privacy note</a>' +
               '</span></label>' +
             '<div class="g-tips">' +
-            '<div class="g-tips-t">For the best result</div>' +
-            '<div class="g-tips-g">' +
-            '<div class="g-tip "><svg viewBox="0 0 24 24" fill="none" stroke="#1f2d2b" stroke-width="1.6" stroke-linecap="round"><path d="M3 4v16M21 4v16M3 15h18"/><path d="M8 19l-3-2 3-2M16 19l3-2-3-2M5 17h14"/></svg><span>Stand back so the floor and a wall are both in shot</span></div>' +
-            '<div class="g-tip "><svg viewBox="0 0 24 24" fill="none" stroke="#1f2d2b" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="11" r="4"/><path d="M12 2v2M12 18v2M3 11h2M19 11h2M5.6 4.6l1.4 1.4M17 17l1.4 1.4M18.4 4.6L17 6M7 17l-1.4 1.4"/></svg><span>Switch the lights on, or shoot in daylight</span></div>' +
-            '<div class="g-tip "><svg viewBox="0 0 24 24" fill="none" stroke="#1f2d2b" stroke-width="1.6" stroke-linecap="round"><rect x="8" y="2.5" width="8" height="19" rx="1.6"/><path d="M4 12h3M17 12h3"/></svg><span>Hold your phone upright and level</span></div>' +
-            '<div class="g-tip no"><svg viewBox="0 0 24 24" fill="none" stroke="#b4231b" stroke-width="1.6" stroke-linecap="round"><rect x="4" y="4" width="16" height="14" rx="1.5"/><path d="M12 4v14M4 11h16"/><path d="M3 21L21 3" stroke-width="2"/></svg><span>Don&rsquo;t shoot straight into a window</span></div>' +
-            '</div></div>' +
+            // Item 19, 25 Oct. Four icon-and-text tips were the 'too much text before a photo
+            // is chosen' Harsh flagged twice. Two real photos say it faster: both are ours, and
+            // both are measured -- the Howrah living room (mean 147, rendered well) and the
+            // terrace (98.2, rendered badly and passed every photometric threshold we had).
+            '<div class="g-ex">' +
+              '<figure><img src="https://txkxblempgconaeplqde.supabase.co/storage/v1/object/public/embed-public/guide/good_example.jpg" alt="a room photo that works">' +
+                '<figcaption class="ok">&#10003; a room, floor and wall in shot</figcaption></figure>' +
+              '<figure><img src="https://txkxblempgconaeplqde.supabase.co/storage/v1/object/public/embed-public/guide/bad_example.jpg" alt="a photo that does not work">' +
+                '<figcaption class="no">&#10007; outdoors, or no wall</figcaption></figure>' +
+            '</div>' +
           '<div class="g-drop g-off" aria-disabled="true">📷 Upload a photo of your room<br>' +
               '<span style="font-size:12px">tick the box above to continue</span></div>' +
             '<input class="g-file" type="file" accept="image/*" capture="environment" style="display:none">' +
             '<img class="g-prev" alt="your room">' +
+            '<div class="g-photowarn"></div>' +
             '<div class="g-rooms" style="display:none"></div>' +
             '<button class="g-link g-phone" style="display:none">📱 Continue on your phone</button>' +
             '<div class="g-hand" style="display:none"></div>' +
@@ -278,9 +299,32 @@
   $('.g-retry').addEventListener('click', function () { show('upload') })
 
   var consentCb = $('.g-consent-cb'), dropEl = $('.g-drop'), consentAt = null, roomKeyPicked = null
+  var photoWarnings = []          // warnings on the CURRENT upload
+  var photoAck = false            // the shopper chose to use a photo we warned about
   function updateGen () {
-    if ((roomDataUrl || roomKeyPicked) && consentCb && consentCb.checked) genBtn.removeAttribute('disabled')
+    var warned = photoWarnings.length > 0 && !photoAck
+    if ((roomDataUrl || roomKeyPicked) && consentCb && consentCb.checked && !warned) genBtn.removeAttribute('disabled')
     else genBtn.setAttribute('disabled', '')
+  }
+
+  // Render the warnings, if any, with a way past them. Fails OPEN: any error here leaves the
+  // upload exactly as it was before the gate existed.
+  function showPhotoWarnings (sel, onAck) {
+    try {
+      var box = $(sel)
+      if (!box) return
+      if (!photoWarnings.length) { box.style.display = 'none'; box.innerHTML = ''; return }
+      box.innerHTML = '<b>This photo may not give a good preview</b><ul>' +
+        photoWarnings.map(function (w) { return '<li>' + w + '</li>' }).join('') +
+        '</ul><button class="g-anyway" type="button">Use this photo anyway</button>'
+      box.style.display = 'block'
+      var btn = box.querySelector('.g-anyway')
+      if (btn) btn.addEventListener('click', function () {
+        photoAck = true
+        box.innerHTML = '<b>Using this photo.</b> If the preview disappoints, try a brighter, steadier shot.'
+        onAck()
+      })
+    } catch (e) { photoWarnings = []; photoAck = true; onAck() }
   }
   // DPDP: consent is an affirmative action taken BEFORE we take the photo, so it gates the
   // picker itself. Unticked by default — never pre-tick this.
@@ -305,6 +349,34 @@
   // Prepare the upload in the browser: measure quality on the ORIGINAL pixels (faithful, and it
   // keeps heavy decoding off the edge function), then downscale so the payload — and the stored
   // copy — land in the 200-400 KB band. Also cuts what we send to Gemini.
+  // ---- upload gate -------------------------------------------------------------------
+  // Refuse to spend a render on a photo that cannot produce a good one. WARNS, never blocks:
+  // the shopper may know something we do not, so every warning has a way past it.
+  //
+  // CALIBRATED AGAINST REAL FILES, and the thresholds are deliberately low. Measured means of
+  // rooms that rendered WELL: 80, 91, 104, 147, 149, 153, 156. The client's night-terrace photo
+  // that rendered BADLY measures 98 — INSIDE that range, and so do its p5, median, dark share
+  // and dynamic range. No exposure statistic separates it from a good room, so this gate is a
+  // floor for genuinely unusable photos, not a quality oracle. It will not catch a terrace at
+  // night, and tuning it until it does would false-warn on rooms we know work.
+  //   dark      < 72   below every known-good room (lowest was 80)
+  //   blurry    < 120  the empty-flat photo that rendered well measures 245
+  //   small     < 800  px on the short edge
+  //   blown     > 15%  highest observed on a good room was 3.4%
+  function assessPhoto (m) {
+    var out = []
+    if (!m) return out
+    if (m.brightness !== null && m.brightness < 72) out.push(
+      'This room looks quite dark. A photo taken in daylight, or with the lights on, gives a much better result.')
+    if (m.sharpness !== null && m.sharpness < 120) out.push(
+      'This photo looks a little soft. Hold the phone steady and try again.')
+    if (m.w && m.h && Math.min(m.w, m.h) < 800) out.push(
+      'This photo is low resolution. A photo straight from your camera works best.')
+    if (m.blown !== undefined && m.blown > 15) out.push(
+      'The window is washing out the shot. Try standing with the window behind you.')
+    return out
+  }
+
   function prepPhoto (file, cb) {
     var fr = new FileReader()
     fr.onload = function () {
@@ -334,6 +406,9 @@
             }
           }
           if (n) { var mu = lsum / n; m.sharpness = Math.round(((lsq / n) - mu * mu) * 10) / 10 }
+          var blown = 0
+          for (var bq = 0; bq < g.length; bq++) if (g[bq] > 250) blown++
+          m.blown = Math.round((1000 * blown) / g.length) / 10          // % of pixels near-clipped
         } catch (e) { /* metrics are best-effort; never block the upload */ }
         var MAX = 1440, s2 = Math.min(MAX / ow, MAX / oh, 1)
         var c = document.createElement('canvas')
@@ -353,7 +428,10 @@
     var f = fileInput.files && fileInput.files[0]; if (!f) return
     prepPhoto(f, function (dataUrl, meta) {
       roomDataUrl = dataUrl; photoMeta = meta; roomKeyPicked = null   // a fresh upload wins
-      prev.src = dataUrl; prev.style.display = 'block'; updateGen()
+      prev.src = dataUrl; prev.style.display = 'block'
+      photoWarnings = assessPhoto(meta); photoAck = false
+      showPhotoWarnings('.g-photowarn', updateGen)
+      updateGen()
     })
   })
 
@@ -480,6 +558,7 @@
           price_inr: (v.price_inr != null ? v.price_inr : product.price_inr),
           image_url: v.image_url,
           buy_link: v.buy_link || product.buy_link,
+          dims: product.dims || '',
           product_id: product.product_id || null,
           variant: v.label,
         })
@@ -681,6 +760,7 @@
               '<span style="font-size:12px">tick the box above to continue</span></div>' +
             '<input class="l-file" type="file" accept="image/*" capture="environment" style="display:none">' +
             '<img class="g-prev l-prev" alt="your room">' +
+            '<div class="g-photowarn l-photowarn"></div>' +
             '<div class="g-rooms l-rooms" style="display:none"></div>' +
             '<button class="g-link g-phone l-phone" style="display:none">📱 Continue on your phone</button>' +
             '<div class="g-hand l-hand" style="display:none"></div>' +
@@ -700,6 +780,7 @@
 
     var L = function (s) { return lr.querySelector(s) }
     var pill = L('.l-pill'), lov = L('.l-ov'), lfile = L('.l-file'), lprev = L('.l-prev')
+    var lWarnings = [], lAck = false        // same upload gate as the single-product panel
     var lgo = L('.l-go'), lcb = L('.l-consent-cb'), ldrop = L('.l-drop')
 
     // Bottom-RIGHT is the category convention and what shoppers expect. Two collisions to avoid:
@@ -785,7 +866,8 @@
       // this could not happen -- you could only reach the drawer by adding something. Now that a
       // first-time visitor can open it with nothing in it, "See my look" has to stay disabled or
       // it would spend a credit staging nothing.
-      if ((lroom || lroomKey) && lcb.checked && lookGet().length) lgo.removeAttribute('disabled'); else lgo.setAttribute('disabled', '')
+      var warned = lWarnings.length > 0 && !lAck
+      if ((lroom || lroomKey) && lcb.checked && lookGet().length && !warned) lgo.removeAttribute('disabled'); else lgo.setAttribute('disabled', '')
     }
     lcb.addEventListener('change', function () {
       var ok = lcb.checked
@@ -804,7 +886,28 @@
     ldrop.addEventListener('click', function () { if (lcb.checked) lfile.click() })
     lfile.addEventListener('change', function () {
       var f = lfile.files && lfile.files[0]; if (!f) return
-      prepPhoto(f, function (d, m) { lroom = d; lmeta = m; lroomKey = null; lprev.src = d; lprev.style.display = 'block'; updL() })
+      prepPhoto(f, function (d, m) {
+        lroom = d; lmeta = m; lroomKey = null; lprev.src = d; lprev.style.display = 'block'
+        lWarnings = assessPhoto(m); lAck = false
+        try {
+          var box = L('.l-photowarn')
+          if (box) {
+            if (!lWarnings.length) { box.style.display = 'none'; box.innerHTML = '' }
+            else {
+              box.innerHTML = '<b>This photo may not give a good preview</b><ul>' +
+                lWarnings.map(function (w) { return '<li>' + w + '</li>' }).join('') +
+                '</ul><button class="g-anyway" type="button">Use this photo anyway</button>'
+              box.style.display = 'block'
+              box.querySelector('.g-anyway').addEventListener('click', function () {
+                lAck = true
+                box.innerHTML = '<b>Using this photo.</b> If the preview disappoints, try a brighter, steadier shot.'
+                updL()
+              })
+            }
+          }
+        } catch (e) { lWarnings = []; lAck = true }   // fail open
+        updL()
+      })
     })
     pill.addEventListener('click', function () {
       roomsCache = null; refresh(); renderSaved(); lov.classList.add('open'); lshow('upload'); applyBrandConfigTo(L)
