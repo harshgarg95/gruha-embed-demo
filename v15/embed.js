@@ -215,7 +215,7 @@
             '<div class="g-hand" style="display:none"></div>' +
             '<button class="g-cta" disabled>Generate</button>' +
           '</div>' +
-          '<div class="g-step g-step-load" style="display:none"><div class="g-spin"><div class="g-dot"></div><div>Staging your room… this usually takes 20–30 seconds</div></div></div>' +
+          '<div class="g-step g-step-load" style="display:none"><div class="g-spin"><div class="g-dot"></div><div>Staging your room… this usually takes 30–45 seconds</div></div></div>' +
           '<div class="g-step g-step-res" style="display:none">' +
             '<div class="g-res"><img alt="your room with the product"></div>' +
             '<div class="g-quote"></div>' +
@@ -415,7 +415,20 @@
         c.width = Math.max(1, Math.round(ow * s2)); c.height = Math.max(1, Math.round(oh * s2))
         c.getContext('2d').drawImage(img, 0, 0, c.width, c.height)
         var out
-        try { out = c.toDataURL('image/jpeg', 0.82) } catch (e) { out = fr.result }
+        // B2, 26 Oct. A phone photo is ALREADY a JPEG, so this is a SECOND encode on every real
+        // upload — not a fixture artifact. Measured on the checklist's walls step, which has to
+        // enumerate the walls in the room before anything can be placed against one:
+        //     two encodes @0.82  ->  free wall found 0/4   (it sees 2 walls, not 3)
+        //     two encodes @0.92  ->  free wall found 4/4
+        //     two encodes @0.95  ->  free wall found 4/4   (+30% bytes over 0.92, no better)
+        // 0.82 was quietly costing us the one wall the product needed. 195 KB -> 297 KB buys it
+        // back. If the photo is already small enough, skip the round-trip entirely.
+        var noResize = s2 === 1
+        try {
+          out = (noResize && file.size <= 2 * 1024 * 1024 && /jpe?g/i.test(file.type))
+            ? fr.result                                   // already fine: send the original bytes
+            : c.toDataURL('image/jpeg', 0.92)
+        } catch (e) { out = fr.result }
         cb(out, m)
       }
       img.onerror = function () { cb(fr.result, null) }
