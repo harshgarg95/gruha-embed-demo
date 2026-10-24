@@ -38,6 +38,11 @@
     // sent it, so every scale cue in production ran on an empty string and the size gate saw 0 cm.
     // The fix was made on one side only; the assertion for it lives on the COMPOSED REQUEST.
     dims: script.getAttribute('data-product-dims') || '',
+    // B1, 26 Oct: the class is known BEFORE the upload, so the panel can ask for the right photo
+    // instead of refusing 45 s later. One furnished room in eight has a free wall — but we were
+    // asking shoppers to photograph "their room" when, for a floor mirror, the useful input is
+    // the wall where it would go. The scarcity was partly in the request, not in their homes.
+    klass: script.getAttribute('data-product-class') || '',
   }
   if (!cfg.key || !cfg.endpoint) { console.warn('[Gruha] missing data-gruha-key or data-endpoint'); return }
   // A product is OPTIONAL: on non-product pages the script still loads so the "Your Look" pill
@@ -174,6 +179,8 @@
   .g-ex figcaption{font-size:11.5px;line-height:1.3;margin-top:5px;color:#4a5351}\
   .g-ex figcaption.ok{color:#2c6e49}\
   .g-ex figcaption.no{color:#b4231b}\
+  .g-ask{font-size:12.5px;line-height:1.45;color:#1f2d2b;background:#f3f6f5;border-radius:10px;\
+    padding:9px 11px;margin:0 0 12px}\
   .g-tip{display:flex;gap:7px;align-items:flex-start;font-size:12px;line-height:1.35;color:#4a5351}\
   .g-tip svg{flex:0 0 auto;width:26px;height:26px;margin-top:-1px}\
   .g-tip.no{color:#8a5a55}\
@@ -205,6 +212,7 @@
               '<figure><img src="https://txkxblempgconaeplqde.supabase.co/storage/v1/object/public/embed-public/guide/bad_example.jpg" alt="a photo that does not work">' +
                 '<figcaption class="no">&#10007; outdoors, or no wall</figcaption></figure>' +
             '</div>' +
+            '<div class="g-ask"></div>' +
           '<div class="g-drop g-off" aria-disabled="true">📷 Upload a photo of your room<br>' +
               '<span style="font-size:12px">tick the box above to continue</span></div>' +
             '<input class="g-file" type="file" accept="image/*" capture="environment" style="display:none">' +
@@ -261,6 +269,17 @@
   }
 
   var ov = $('.g-ov'), fileInput = $('.g-file'), prev = $('.g-prev'), genBtn = $('.g-cta')
+  // One line, chosen by the product's class. Replaces guidance we were only giving as a refusal.
+  var ASK = {
+    largepiece:  'Photograph the wall where you\'d put it — stand back far enough to see the floor meet the wall.',
+    replaceable: 'Photograph the piece you\'d be replacing, with the room around it.',
+    small:       'Photograph the table or shelf where it would sit.',
+  }
+  var askEl = $('.g-ask')
+  if (askEl) {
+    var line = ASK[product.klass] || ASK.largepiece
+    if (hasProduct) askEl.textContent = line; else askEl.style.display = 'none'
+  }
   var roomDataUrl = null
   function show(step) {
     ;['upload', 'load', 'res', 'err'].forEach(function (s) {

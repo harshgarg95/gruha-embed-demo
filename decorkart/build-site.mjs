@@ -192,7 +192,8 @@ ${BAR}
   data-product-price="${p.price_inr}"
   data-product-image="${esc(p.image_url)}"
   data-product-buylink="${esc(p.buy_link)}"
-  data-product-dims="${esc(p.dims || '')}"${variantAttr}
+  data-product-dims="${esc(p.dims || '')}"
+  data-product-class="${({'small-decor':'small','mid':'replaceable','large-floor':'largepiece'})[p.size] || 'largepiece'}"${variantAttr}
   data-mount="#gslot" data-label="See it in your room" data-currency="INR" async></script>
 </body></html>
 `)
