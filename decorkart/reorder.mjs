@@ -12,7 +12,9 @@
 // small tabletop decor balloons. So the order is: known-good first, then large floor/wall,
 // then mid floor-standing, then the two known-weak pieces, then small decor last.
 //
-// Every product stays in the demo. This is merchandising, not concealment.
+// Every REMAINING product stays in the demo. This is merchandising, not concealment.
+// 24 Oct: four products were REMOVED from products.json entirely because their Buy links 404 —
+// that is a dead link, not merchandising, and check-links.mjs now guards against it.
 //
 //   node reorder.mjs          # print before/after, change nothing
 //   APPLY=1 node reorder.mjs  # write rank into products.json
@@ -23,23 +25,22 @@ const products = JSON.parse(readFileSync(FILE, 'utf8'))
 
 // best first. Matched on a distinctive substring so a price or title tweak does not break it.
 const ORDER = [
-  ['Acacia Distressed Finish Console',        'scored 76.0 — the only measured pass we have'],
-  ['Provence Scrollwork Console Table',       'same class as the scored pass: large, against a wall'],
-  ["'Cromwell' Spruce Cabinet - Tall",        'large floor-standing, sits against a wall'],
-  ['Vintage Bohemian Chic Round Floor Rug',   'floor plane — no placement ambiguity at all'],
-  ["'Equine' Sandblast Framed Wall Art",      'wall plane — no placement ambiguity at all'],
-  ['Sky Blossom Garden Stool',                'floor-standing, reads at room scale'],
-  ['The Estate Blue & White Hand-Painted Pla','large floor planter'],
-  ['Royal Orbit Serving Bar Cart',            'floor-standing; recorded as rendering acceptably'],
-  ["'Yorkshire' Victorian Ornamental Side Ta",'mid, floor-standing, unscored'],
-  ['Ornate Floral Scroll Small Ceramic Stool','mid, floor-standing, unscored'],
-  ['The Versailles Distressed Baroque Floor', 'scored 58.6 — out of the first row (was position 1)'],
-  ['Industrial Gare Clock Center Table',      'scored 60.4 — out of the first row (was position 4)'],
-  ['Botanical Nouveau Tiffany Floor Lamp',    'recorded mid-room placement failure'],
-  ['Midnight Regent Crystal Table Lamp',      'small decor — the category that balloons'],
-  ['Fluted Classic Table Lamp',               'small decor — the category that balloons'],
-  ['Blue Chinoiserie Scalloped Fruit Bowl',   'scored 58.1 — small decor'],
-  ['Charming Duck Tabletop Decor',            'smallest item in the catalogue'],
+  // Tier 1 — the only products that have passed all three axes on a real render.
+  ['Industrial Gare Clock Center Table',      'PASSED all three axes (replace path, 22 Oct)'],
+  ['Blue Chinoiserie Scalloped Fruit Bowl',   'PASSED all three axes; small decor that did NOT balloon'],
+  // Tier 2 — replace and on-surface, the two paths that demonstrably work.
+  ['Acacia Distressed Finish Console',        'scored 76.0 and relights well (+1.9 -> +37.7), but the size gate refuses it against a TV unit, so it sits behind the two confirmed passes'],
+  ["'Yorkshire' Victorian Ornamental Side Table", 'replace path — a side table for a side table'],
+  ['Vintage Bohemian Chic Round Floor Rug',   'replace path — rug for rug, floor plane, no placement ambiguity'],
+  ['Provence Scrollwork Console Table',       'replace path, same class as the scored pass'],
+  ['Charming Duck Tabletop Decor',            'on-surface path'],
+  ['Fluted Classic Table Lamp',               'on-surface path'],
+  // Tier 3 — floor and wall pieces. These are the ones the gates most often refuse.
+  ["'Cromwell' Spruce Cabinet - Tall",        'floor/wall — needs a clear wall, often refused in a furnished room'],
+  ['Sky Blossom Garden Stool',                'floor/wall'],
+  ['Royal Orbit Serving Bar Cart',            'floor/wall'],
+  ['The Versailles Distressed Baroque Floor Mirror', 'floor/wall — never relit on this path (tracker item 3)'],
+  ["'Equine' Sandblast Framed Wall Art",      'wall plane; dims sourced 24 Oct (88.9 x 129.5 cm)'],
 ]
 
 const rankOf = (name) => {
