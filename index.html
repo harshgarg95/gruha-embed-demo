@@ -19,6 +19,13 @@
   html, body { margin: 0; padding: 0; }
   .mkt-hero__video { width: 100%; border-radius: 14px; display: block; background: #111; aspect-ratio: 16 / 9; object-fit: cover; }
   .mkt-vnote { margin-top: 10px; font-size: 13px; color: var(--muted); }
+  /* marketing.css makes .mkt-hero__media a FLEX ROW above 941px (the Studio puts one slider in
+     it). We put a video AND its caption in there, so the caption became a flex sibling and got
+     squeezed into a ~40px column beside the video. Stack them instead. */
+  @media (min-width: 941px) {
+    .mkt-hero__media { flex-direction: column; justify-content: center; }
+    .mkt-hero__video { height: auto; }
+  }
   .mkt-limits { border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; background: var(--paper); }
   @media (max-width: 760px) { .mkt-limits { padding: 18px; } }
 </style>
