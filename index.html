@@ -3,32 +3,231 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gruha — See it in their room. Buy it from your store.</title>
+<meta name="description" content="Your customer photographs their room. Your product appears in it at its real size, lit by their own light, with your price and a link straight to your checkout.">
 <meta name="robots" content="noindex">
-<title>Gruha — See it in your room</title>
-<!--
-  This used to be a four-product Décor Kart demo. It is now a redirect to /decorkart/, because:
-   - it carried hard-coded prices that had gone stale upstream (a console shown at Rs.28,600 that
-     Décor Kart now sells for Rs.24,310), and a demo with wrong prices is worse than no demo;
-   - /decorkart/ is the URL that goes in the outreach email, and anyone who strips the path off it
-     should land in the demo rather than on a second, older copy of it.
-  GitHub Pages serves static files only, so this is a meta refresh plus a real link for anyone whose
-  browser blocks it. The widget itself is unaffected: it is served from /v13/embed.js.
--->
-<meta http-equiv="refresh" content="0; url=/decorkart/">
-<link rel="canonical" href="https://room.gruhalabs.com/decorkart/">
+<meta property="og:title" content="See it in their room. Buy it from your store.">
+<meta property="og:description" content="One button on your product page. Your customer's phone photo comes back as a priced room.">
+<meta property="og:image" content="https://room.gruhalabs.com/media/walkthrough-poster.jpg">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,700,800&f[]=general-sans@400,500,600&display=swap">
+<link rel="stylesheet" href="/media/marketing.css">
 <style>
-  body{margin:0;min-height:100vh;display:grid;place-items:center;background:#faf7f2;color:#241f1b;
-       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-align:center;padding:24px}
-  a{color:#b08642;font-weight:700}
-  p{color:#8a827a}
+  /* Page-local only. Everything structural comes from marketing.css so this page and the Studio
+     page stay one design, not two that drift. */
+  html, body { margin: 0; padding: 0; }
+  .mkt-hero__video { width: 100%; border-radius: 14px; display: block; background: #111; aspect-ratio: 16 / 9; object-fit: cover; }
+  .mkt-vnote { margin-top: 10px; font-size: 13px; color: var(--muted); }
+  .mkt-limits { border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; background: var(--paper); }
+  @media (max-width: 760px) { .mkt-limits { padding: 18px; } }
 </style>
 </head>
-<body>
-  <div>
-    <h1>See it in your room</h1>
-    <p>Taking you to the demo storefront…</p>
-    <p><a href="/decorkart/">Open the Décor Kart demo</a></p>
+<body class="mkt">
+
+<nav class="mkt-nav">
+  <div class="mkt-wrap mkt-nav__row">
+    <a class="mkt-brand" href="#top">
+      <span class="mkt-brand__mark">G</span>
+      <span class="mkt-brand__name">Gruha</span>
+    </a>
+    <div class="mkt-nav__links">
+      <div class="mkt-nav__linkset">
+        <a href="#how">How it works</a>
+        <a href="#quote">The quote</a>
+        <a href="#limits">Honest limits</a>
+      </div>
+      <a class="mkt-btn mkt-btn--primary" href="/demo/">Try the live demo</a>
+    </div>
   </div>
-  <script>location.replace('/decorkart/')</script>
+</nav>
+
+<header id="top" class="mkt-hero">
+  <div class="mkt-wrap mkt-hero__grid">
+    <div>
+      <p class="mkt-eyebrow">&ldquo;See it in your room&rdquo; · for furniture &amp; décor brands</p>
+      <h1>See it in <span class="mkt-hero__accent">their</span> room. Buy it from your store.</h1>
+      <p class="mkt-hero__sub">
+        A customer photographs their living room. Your product appears in it — at its real size,
+        lit by their own light, with your price and a link straight to your checkout.
+      </p>
+      <div class="mkt-hero__cta">
+        <a class="mkt-btn mkt-btn--primary" href="/demo/">Try the live demo →</a>
+      </div>
+      <p class="mkt-hero__note">
+        <span class="mkt-dot" aria-hidden="true"></span>
+        Free to try · No login · Nothing edited in your theme
+      </p>
+    </div>
+    <div class="mkt-hero__media">
+      <video class="mkt-hero__video" autoplay muted loop playsinline preload="metadata"
+             poster="/media/walkthrough-poster.jpg" controls>
+        <source src="/media/walkthrough-1280.mp4" type="video/mp4">
+      </video>
+      <p class="mkt-vnote">The whole thing, start to finish — about a minute. Captions are burned in; sound is optional.</p>
+    </div>
+  </div>
+</header>
+
+<section class="mkt-trust" aria-label="What this is built for">
+  <div class="mkt-wrap">
+    <p class="mkt-trust__lead">Built for furniture &amp; décor brands</p>
+    <ul class="mkt-trust__list">
+      <li>Real catalogue SKUs</li>
+      <li>Quotes in ₹</li>
+      <li>From a phone photo</li>
+      <li>No showroom needed</li>
+    </ul>
+  </div>
+</section>
+
+<section id="problem" class="mkt-section mkt-band">
+  <div class="mkt-wrap mkt-problem__grid">
+    <div class="mkt-problem__intro">
+      <p class="mkt-eyebrow">The problem</p>
+      <h2 class="mkt-h2">Customers can&rsquo;t picture it in their own space.</h2>
+      <p class="mkt-sectlead">
+        A white-background product shot tells them what it looks like. It does not tell them
+        whether it fits, whether it suits the room, or what it costs once it is in there.
+      </p>
+    </div>
+    <ul class="mkt-friction">
+      <li class="mkt-friction__item"><b>&ldquo;Will it fit?&rdquo;</b> Dimensions in centimetres are not a picture of your hallway.</li>
+      <li class="mkt-friction__item"><b>&ldquo;Will it suit my room?&rdquo;</b> A studio shot shares no light, no floor, no walls with their home.</li>
+      <li class="mkt-friction__item"><b>&ldquo;I&rsquo;ll think about it.&rdquo;</b> The browser tab closes and the cart stays empty.</li>
+      <li class="mkt-friction__kicker">Every one of those is answered by one photograph of the room they already own.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="why" class="mkt-section">
+  <div class="mkt-wrap">
+    <div class="mkt-sect-head mkt-sect-head--center">
+      <p class="mkt-eyebrow">Why brands use Gruha</p>
+      <h2 class="mkt-h2">Turn &ldquo;I&rsquo;ll think about it&rdquo; into orders.</h2>
+      <p class="mkt-sectlead">
+        The traffic is already on your product page. This gives the undecided ones the one thing
+        a product shot cannot: their own room, with your piece in it.
+      </p>
+    </div>
+    <div class="mkt-outcomes">
+      <article class="mkt-outcome"><div class="mkt-outcome__ic">↗</div><h3>Fewer abandoned carts</h3><p>The doubt that stops the order is answered on the page, not after a support email.</p></article>
+      <article class="mkt-outcome"><div class="mkt-outcome__ic">↺</div><h3>Fewer returns</h3><p>They have already seen the real size in their real room before they pay.</p></article>
+      <article class="mkt-outcome"><div class="mkt-outcome__ic">₹</div><h3>Bigger baskets</h3><p>A staged room is a room with more than one thing in it, and every line has a buy link.</p></article>
+    </div>
+  </div>
+</section>
+
+<section id="how" class="mkt-section mkt-band">
+  <div class="mkt-wrap">
+    <div class="mkt-sect-head">
+      <p class="mkt-eyebrow">How it works</p>
+      <h2 class="mkt-h2">One room, four steps</h2>
+      <p class="mkt-sectlead">From your customer&rsquo;s phone photo to a priced room — in about thirty seconds.</p>
+    </div>
+    <div class="mkt-how__grid">
+      <article class="mkt-step">
+        <div class="mkt-step__num">01</div>
+        <h3>One button on your product page</h3>
+        <p>Switched on from your theme editor. Nothing in your theme gets edited.</p>
+      </article>
+      <article class="mkt-step">
+        <div class="mkt-step__num">02</div>
+        <h3>Your customer uploads a photo</h3>
+        <p>Of the room they&rsquo;re buying for — bare or already lived-in.</p>
+      </article>
+      <article class="mkt-step">
+        <div class="mkt-step__num">03</div>
+        <h3>Your product appears in it</h3>
+        <p>At its real size, lit by the light already in that room.</p>
+      </article>
+      <article class="mkt-step">
+        <div class="mkt-step__num">04</div>
+        <h3>An itemised quote in ₹</h3>
+        <p>With a link straight to your product page.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="quote" class="mkt-section">
+  <div class="mkt-wrap mkt-quote__grid">
+    <div>
+      <p class="mkt-eyebrow">The deliverable</p>
+      <h2 class="mkt-h2">The render comes with the receipt.</h2>
+      <p class="mkt-sectlead">
+        Not just a pretty picture — a shoppable, itemised quote in rupees. Your customer taps a
+        buy-link and orders the exact piece they saw in their room.
+      </p>
+    </div>
+    <div class="mkt-quote__panel" aria-label="Example itemised quote">
+      <div class="mkt-receipt__h">Your quote · staged living room</div>
+      <div class="mkt-qitem">
+        <div><div class="mkt-qitem__name">Versailles floor mirror</div><span class="mkt-qitem__meta">Buy-link included</span></div>
+        <div class="mkt-qitem__price">₹24,310</div>
+      </div>
+      <div class="mkt-qitem">
+        <div><div class="mkt-qitem__name">Cromwell spruce cabinet</div><span class="mkt-qitem__meta">Buy-link included</span></div>
+        <div class="mkt-qitem__price">₹38,900</div>
+      </div>
+      <div class="mkt-qitem">
+        <div><div class="mkt-qitem__name">Blue chinoiserie fruit bowl</div><span class="mkt-qitem__meta">Buy-link included</span></div>
+        <div class="mkt-qitem__price">₹2,450</div>
+      </div>
+      <div class="mkt-qtotal"><span class="lab">Total</span><span class="val">₹65,660</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="limits" class="mkt-section mkt-band">
+  <div class="mkt-wrap">
+    <div class="mkt-sect-head">
+      <p class="mkt-eyebrow">Honest limits</p>
+      <h2 class="mkt-h2">What it does, and what it doesn&rsquo;t.</h2>
+    </div>
+    <div class="mkt-limits">
+      <p class="mkt-sectlead" style="margin:0">
+        It&rsquo;s a visualisation, not a photograph. A daylit indoor shot gives a much better
+        result than a dim or outdoor one — and when a room has nowhere sensible for a large piece,
+        it says so and asks for a better photo rather than inventing a spot.
+      </p>
+    </div>
+    <ul class="mkt-trust__list" style="margin-top:22px">
+      <li>Your room comes back unchanged</li>
+      <li>Real prices from your real catalogue</li>
+      <li>Small pieces come out at their real size</li>
+    </ul>
+  </div>
+</section>
+
+<section class="mkt-section mkt-band--ink mkt-cta">
+  <div class="mkt-wrap">
+    <h2>Try it on your own room.</h2>
+    <p>Pick any piece, upload a photo of a room you know, and judge the result yourself.</p>
+    <div><a class="mkt-btn mkt-btn--primary" href="/demo/">Try the live demo →</a></div>
+    <p class="mkt-cta__fine">Free to try. No login. Nothing edited in your theme.</p>
+    <p class="mkt-cta__fine">Prefer email? Just reply to my message.</p>
+  </div>
+</section>
+
+<footer class="mkt-footer">
+  <div class="mkt-wrap mkt-footer__row">
+    <div>
+      <a class="mkt-brand" href="#top"><span class="mkt-brand__mark">G</span><span class="mkt-brand__name">Gruha</span></a>
+      <p class="mkt-footer__meta" style="margin-top:12px">&ldquo;See it in your room&rdquo; for furniture &amp; décor brands · Made in India</p>
+    </div>
+    <div class="mkt-footer__links">
+      <a href="#problem">Why it matters</a>
+      <a href="#how">How it works</a>
+      <a href="#quote">The quote</a>
+      <a href="#limits">Honest limits</a>
+      <a href="/demo/">Live demo</a>
+    </div>
+  </div>
+  <div class="mkt-wrap" style="margin-top:22px">
+    <p class="mkt-footer__meta">© 2026 Gruha</p>
+  </div>
+</footer>
+
 </body>
 </html>

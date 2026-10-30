@@ -10,8 +10,22 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-echo "== The Décor Kart (/decorkart) =="
-( cd decorkart && node build-catalog.mjs && node build-site.mjs )
+# AK, 30 Oct: the public storefront moved /decorkart -> /demo. Outreach goes to brands who
+# compete with that retailer, so the URL, the page title and the header carry no brand name.
+# The catalogue file stays where it is and /demo builds FROM it -- two copies of a price list is
+# how a demo ends up quoting a figure the retailer no longer charges.
+echo "== demo storefront (/demo) =="
+( cd decorkart && node build-catalog.mjs )
+SITE_DIR=demo SITE_PRODUCTS=decorkart/products.json \
+  SITE_BASE=/demo/ \
+  SITE_BRAND="THE DEMO STORE" \
+  SITE_TITLE="The Demo Store" \
+  SITE_SOURCE="a live Indian décor catalogue" \
+  node decorkart/build-site.mjs
+
+echo
+echo "== redirects for the retired /decorkart paths =="
+node decorkart/make-redirects.mjs
 
 echo
 echo "== Orange Tree seating (/furniture) =="

@@ -17,7 +17,13 @@ import { readFileSync, writeFileSync, mkdirSync, rmSync, readdirSync } from 'nod
 const here = process.env.SITE_DIR
   ? new URL(`../${process.env.SITE_DIR}/`, import.meta.url)
   : new URL('./', import.meta.url)
-const products = JSON.parse(readFileSync(new URL('./products.json', here), 'utf8'))
+// AK: SITE_PRODUCTS lets a second storefront build from the SAME catalogue file instead of a
+// copy. /demo and /decorkart show identical products, and two copies of a price list is exactly
+// how a demo ends up quoting a figure the retailer no longer charges.
+const catalogue = process.env.SITE_PRODUCTS
+  ? new URL(`../${process.env.SITE_PRODUCTS}`, import.meta.url)
+  : new URL('./products.json', here)
+const products = JSON.parse(readFileSync(catalogue, 'utf8'))
 // Display order is data, not array position: products.json carries an explicit `rank` (see
 // reorder.mjs). Anything without one keeps its file order, after the ranked items.
   .map((p, i) => ({ ...p, _i: i }))
@@ -31,6 +37,13 @@ const BRAND    = process.env.SITE_BRAND   || 'THE DÉCOR KART'
 const SHOPHOST = process.env.SITE_SHOP    || 'thedecorkart.com'
 const NAV      = (process.env.SITE_NAV    || 'Furniture,Lighting,Décor,Mirrors').split(',')
 const INTRO    = process.env.SITE_INTRO   || ''
+// AK, 30 Oct: the page TITLE still hard-coded the retailer's name, so a neutral build leaked it
+// into the browser tab and into any link preview. Wave 1 goes to five brands who compete with
+// that retailer; a URL or a tab named after a rival is an avoidable own-goal.
+const TITLE    = process.env.SITE_TITLE   || 'The Décor Kart'
+// What the footer credits. The buy links go to the real retailer either way — this only controls
+// how loudly the chrome says so.
+const SOURCE   = process.env.SITE_SOURCE  || SHOPHOST
 
 const WIDGET = '/v15/embed.js'   // v15: the look result finally has Buy (per line) and Download, and '+ Add another product' goes somewhere
 const ENDPOINT = 'https://txkxblempgconaeplqde.supabase.co/functions/v1/embed-render'
@@ -128,20 +141,20 @@ const cards = products.map((p) => `
       </a>`).join('')
 
 writeFileSync(new URL('./index.html', here), `${head(
-  'The Décor Kart — See it in your room (Gruha demo)',
+  `${TITLE} — See it in your room (Gruha demo)`,
   'Pick any piece, upload a photo of your room, and see it staged in your own space — with the price and a buy link.',
 )}
 ${BAR}
 <div class="hero">
   <h1>See it in your room</h1>
   <p>Open any piece below, upload a photo of your space, and see it staged in <b>your own room</b> —
-     with the price and a link to buy. ${products.length} real products from ${SHOPHOST}.</p>
+     with the price and a link to buy. ${products.length} real products from ${SOURCE}.</p>
   ${INTRO ? `<p style="margin-top:12px">${INTRO}</p>` : ''}
 </div>
 <div class="wrap">
   <div class="grid">${cards}
   </div>
-  <div class="foot">Real products and live prices from <b>${SHOPHOST}</b> ·
+  <div class="foot">Real products and live prices from <b>${SOURCE}</b> ·
     one &lt;script&gt; tag per product page · renders on Gruha's server.<br>Powered by <b>Gruha</b>.</div>
 </div>
 ${lookOnlyWidget}
@@ -164,7 +177,7 @@ for (const p of products) {
     ? `\n  data-variants="${esc(JSON.stringify(p.variants))}"`
     : ''
   writeFileSync(new URL(`./p/${p.handle}.html`, here), `${head(
-    `${p.name} — The Décor Kart (Gruha demo)`,
+    `${p.name} — ${TITLE} (Gruha demo)`,
     `${p.name}, ${inr(p.price_inr)}. See it in your own room before you buy.`,
   )}
 ${BAR}
@@ -188,6 +201,7 @@ ${BAR}
 </div>
 <script src="${WIDGET}" data-gruha-key="${BRAND_KEY}"
   data-endpoint="${ENDPOINT}"
+  data-product-id="${esc(p.handle)}"
   data-product-name="${esc(p.name)}"
   data-product-price="${p.price_inr}"
   data-product-image="${esc(p.image_url)}"
