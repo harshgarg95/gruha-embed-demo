@@ -36,6 +36,30 @@
      focusable and a phone has no hover, so on mobile the "before" would never appear at all.
      Show it outright wherever hover is unavailable. */
   @media (hover: none) { .mkt-gcard__before { opacity: 1; transform: none; } }
+
+  /* AL2 — the gallery card is 3/2 in the Studio because its renders are. Ours are 16:9, so
+     object-fit:cover was eating the sides, which is where the floor mirror stands. */
+  .mkt-gcard { aspect-ratio: 16 / 9; }
+
+  /* AL2 — the stepper. The two step buttons were auto-width, so they were unequal and narrower
+     than the image above them. Equal columns, spanning exactly the frame's width, text on one
+     line. */
+  .stage3__steps { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+  .stage3__step { width: 100%; justify-content: flex-start; white-space: nowrap; }
+  .stage3__step-l { white-space: nowrap; }
+  .stage3__control { width: 100%; }
+
+  /* AL2 — a standalone .mkt-sectlead is 58ch anchored left, so text-align:center centred the
+     text inside a left-hung block and read as off-centre. */
+  .mkt-lead--center { margin-left: auto; margin-right: auto; text-align: center; }
+
+  /* .mkt-lightbox sets display:grid, which beats the `hidden` attribute's display:none — so the
+     overlay was open on page load. Same shape as the quote card earlier: a shared class with an
+     explicit display wins over `hidden` unless you say otherwise. */
+  .mkt-lightbox[hidden] { display: none !important; }
+  /* the caption sat on one line with the toggle and clipped off the right edge on narrow
+     viewports; let the row wrap instead. */
+  .mkt-lightbox__toggle { flex-wrap: wrap; }
   .mkt-limits { border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; background: var(--paper); }
   @media (max-width: 760px) { .mkt-limits { padding: 18px; } }
 </style>
@@ -157,7 +181,7 @@
     <div class="mkt-outcomes">
       <article class="mkt-outcome"><div class="mkt-outcome__ic">↗</div><h3>More orders from the same traffic</h3><p>The doubt that stops the order is answered on the page, not after a support email. No extra ad spend.</p></article>
       <article class="mkt-outcome"><div class="mkt-outcome__ic">↺</div><h3>Fewer returns</h3><p>They have already seen the real size in their real room before they pay.</p></article>
-      <article class="mkt-outcome"><div class="mkt-outcome__ic">₹</div><h3>Bigger baskets</h3><p>A staged room is a room with more than one thing in it, and every line has a buy link.</p></article>
+      <article class="mkt-outcome"><div class="mkt-outcome__ic">₹</div><h3>Bigger baskets</h3><p>A staged room is a room with more than one thing in it — and they are all priced together.</p></article>
       <article class="mkt-outcome"><div class="mkt-outcome__ic">◱</div><h3>A closing tool for your team</h3><p>Sales and WhatsApp enquiries get a finished render and a priced quote to send back, instead of a catalogue link.</p></article>
     </div>
   </div>
@@ -210,23 +234,26 @@
     <!-- AL C: one render per placement class, all three verified before publishing.
          The floor-standing-bowl renders and the mis-sized cabinet are deliberately NOT here. -->
     <div class="mkt-gallery__grid">
-      <figure class="mkt-gcard">
+      <figure class="mkt-gcard" role="button" tabindex="0" data-g="bowl" aria-label="Enlarge: On a surface · bowl on a coffee table">
         <img src="/media/renders/g_bowl_after.jpg" alt="A living room with a blue chinoiserie fruit bowl placed on the marble coffee table" loading="lazy" decoding="async">
         <img class="mkt-gcard__before" src="/media/renders/g_bowl_before.jpg" alt="The same living room before, without the bowl" loading="lazy" decoding="async">
+        <span class="mkt-gcard__zoom" aria-hidden="true">⤢</span>
         <figcaption class="mkt-gcard__label">On a surface · bowl on a coffee table</figcaption>
       </figure>
-      <figure class="mkt-gcard">
+      <figure class="mkt-gcard" role="button" tabindex="0" data-g="mirror" aria-label="Enlarge: Against a wall · floor mirror">
         <img src="/media/renders/g_mirror_after.jpg" alt="A bedroom with a tall distressed floor mirror leaning against the right wall" loading="lazy" decoding="async">
         <img class="mkt-gcard__before" src="/media/renders/g_mirror_before.jpg" alt="The same bedroom before, without the mirror" loading="lazy" decoding="async">
+        <span class="mkt-gcard__zoom" aria-hidden="true">⤢</span>
         <figcaption class="mkt-gcard__label">Against a wall · floor mirror</figcaption>
       </figure>
-      <figure class="mkt-gcard">
+      <figure class="mkt-gcard" role="button" tabindex="0" data-g="table" aria-label="Enlarge: In place of something · side table swap">
         <img src="/media/renders/g_table_after.jpg" alt="A bedroom where the bedside table has been swapped for an ornamental blue-and-white pedestal side table" loading="lazy" decoding="async">
         <img class="mkt-gcard__before" src="/media/renders/g_table_before.jpg" alt="The same bedroom before, with the original bedside table" loading="lazy" decoding="async">
+        <span class="mkt-gcard__zoom" aria-hidden="true">⤢</span>
         <figcaption class="mkt-gcard__label">In place of something · side table swap</figcaption>
       </figure>
     </div>
-    <p class="mkt-sectlead" style="text-align:center;margin-top:18px">The inset on each card is the room it started from — shown on touch, revealed on hover.</p>
+    <p class="mkt-sectlead mkt-lead--center" style="margin:18px auto 0;text-align:center">Tap any render to see it full size, and to flip between the room before and after.</p>
   </div>
 </section>
 
@@ -279,33 +306,14 @@
   </div>
 </section>
 
-<section id="limits" class="mkt-section mkt-band">
-  <div class="mkt-wrap">
-    <div class="mkt-sect-head">
-      <p class="mkt-eyebrow">Honest limits</p>
-      <h2 class="mkt-h2">What it does, and what it doesn&rsquo;t.</h2>
-    </div>
-    <div class="mkt-limits">
-      <p class="mkt-sectlead" style="margin:0">
-        It&rsquo;s a visualisation, not a photograph. A daylit indoor shot gives a much better
-        result than a dim or outdoor one — and when a room has nowhere sensible for a large piece,
-        it says so and asks for a better photo rather than inventing a spot.
-      </p>
-    </div>
-    <ul class="mkt-trust__list" style="margin-top:22px">
-      <li>Your room comes back unchanged</li>
-      <li>Real prices from your real catalogue</li>
-      <li>Small pieces come out at their real size</li>
-    </ul>
-  </div>
-</section>
-
 <section class="mkt-section mkt-band--ink mkt-cta">
   <div class="mkt-wrap">
     <h2>Try it on your own room.</h2>
     <p>Pick any piece, upload a photo of a room you know, and judge the result yourself.</p>
     <div><a class="mkt-btn mkt-btn--primary" href="/demo/">Try the live demo →</a></div>
-    <p class="mkt-cta__fine">Free to try. No login. Nothing edited in your theme.</p>
+    <!-- AL2: this repeated the hero's trust line word for word. One line, not two claims twice. -->
+    <p class="mkt-cta__fine">It&rsquo;s a visualisation, not a photograph —
+      <a href="/honest-limits/">what it can and can&rsquo;t do</a>.</p>
     <p class="mkt-cta__fine">Prefer email? Just reply to my message.</p>
   </div>
 </section>
@@ -324,9 +332,24 @@
     </div>
   </div>
   <div class="mkt-wrap" style="margin-top:22px">
-    <p class="mkt-footer__meta">© 2026 Gruha</p>
+    <p class="mkt-footer__meta">© 2026 Gruha · <a href="/honest-limits/">What it can and can’t do</a></p>
   </div>
 </footer>
+
+<div class="mkt-lightbox" id="lb" role="dialog" aria-modal="true" aria-label="Render, before and after" hidden>
+  <div class="mkt-lightbox__inner" id="lbInner">
+    <button class="mkt-lightbox__close" id="lbClose" aria-label="Close">✕</button>
+    <div class="mkt-lightbox__stage">
+      <img id="lbImg" src="" alt="">
+      <span class="mkt-lightbox__tag" id="lbTag">After</span>
+    </div>
+    <div class="mkt-lightbox__toggle" role="group" aria-label="Before or after">
+      <button id="lbAfter" class="is-active" aria-pressed="true">After</button>
+      <button id="lbBefore" aria-pressed="false">Before</button>
+      <span class="mkt-lightbox__cap" id="lbCap"></span>
+    </div>
+  </div>
+</div>
 
 <script>
 // AL B — the hero stepper. The Studio's StageSlider in plain JS: auto-advance until the visitor
@@ -372,6 +395,61 @@
     setInterval(function () { if (!took && inView) paint((stage + 1) % LABELS.length); }, 3200);
   }
   paint(0);
+})();
+
+// AL2 — the gallery lightbox, the Studio's pattern in plain JS. The card crops to 16:9; this
+// shows the render whole (object-fit: contain) and flips to the room it started from.
+(function () {
+  var G = {
+    bowl:   { a: '/media/renders/g_bowl_after.jpg',   b: '/media/renders/g_bowl_before.jpg',   c: 'On a surface · bowl on a coffee table' },
+    mirror: { a: '/media/renders/g_mirror_after.jpg', b: '/media/renders/g_mirror_before.jpg', c: 'Against a wall · floor mirror' },
+    table:  { a: '/media/renders/g_table_after.jpg',  b: '/media/renders/g_table_before.jpg',  c: 'In place of something · side table swap' }
+  };
+  var lb = document.getElementById('lb'), img = document.getElementById('lbImg');
+  var tag = document.getElementById('lbTag'), cap = document.getElementById('lbCap');
+  var bAfter = document.getElementById('lbAfter'), bBefore = document.getElementById('lbBefore');
+  var cur = null, showBefore = false, lastFocus = null, prevOverflow = '';
+
+  function draw() {
+    if (!cur) return;
+    img.src = showBefore ? cur.b : cur.a;
+    img.alt = cur.c + (showBefore ? ', the room before' : ', after');
+    tag.textContent = showBefore ? 'Before' : 'After';
+    cap.textContent = cur.c;
+    bAfter.classList.toggle('is-active', !showBefore);
+    bBefore.classList.toggle('is-active', showBefore);
+    bAfter.setAttribute('aria-pressed', String(!showBefore));
+    bBefore.setAttribute('aria-pressed', String(showBefore));
+  }
+  function open(k, from) {
+    cur = G[k]; showBefore = false; lastFocus = from || null;
+    draw(); lb.removeAttribute('hidden');
+    prevOverflow = document.body.style.overflow; document.body.style.overflow = 'hidden';
+    document.getElementById('lbClose').focus();
+  }
+  function close() {
+    lb.setAttribute('hidden', ''); document.body.style.overflow = prevOverflow;
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  var cards = document.querySelectorAll('.mkt-gcard[data-g]');
+  for (var i = 0; i < cards.length; i++) {
+    (function (el) {
+      el.addEventListener('click', function () { open(el.dataset.g, el); });
+      el.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(el.dataset.g, el); }
+      });
+    })(cards[i]);
+  }
+  lb.addEventListener('click', close);
+  document.getElementById('lbInner').addEventListener('click', function (e) { e.stopPropagation(); });
+  document.getElementById('lbClose').addEventListener('click', close);
+  bAfter.addEventListener('click', function () { showBefore = false; draw(); });
+  bBefore.addEventListener('click', function () { showBefore = true; draw(); });
+  document.addEventListener('keydown', function (e) {
+    if (lb.hasAttribute('hidden')) return;
+    if (e.key === 'Escape') close();
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { showBefore = !showBefore; draw(); }
+  });
 })();
 </script>
 </body>
