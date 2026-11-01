@@ -17,15 +17,21 @@
   /* Page-local only. Everything structural comes from marketing.css so this page and the Studio
      page stay one design, not two that drift. */
   html, body { margin: 0; padding: 0; }
-  .mkt-hero__video { width: 100%; border-radius: 14px; display: block; background: #111; aspect-ratio: 16 / 9; object-fit: cover; }
-  .mkt-vnote { margin-top: 10px; font-size: 13px; color: var(--muted); }
-  /* marketing.css makes .mkt-hero__media a FLEX ROW above 941px (the Studio puts one slider in
-     it). We put a video AND its caption in there, so the caption became a flex sibling and got
-     squeezed into a ~40px column beside the video. Stack them instead. */
-  @media (min-width: 941px) {
-    .mkt-hero__media { flex-direction: column; justify-content: center; }
-    .mkt-hero__video { height: auto; }
-  }
+  /* The hero media is now the stage3 stepper alone, which is what marketing.css's
+     `.mkt-hero__media > .stage3 { height:100%; min-height:540px }` rule expects — so the
+     flex-direction override the old video+caption pair needed is gone with it. */
+  .mkt-video__el { width: 100%; height: 100%; display: block; border: 0; background: #111; object-fit: cover; }
+  /* The Studio's stage3 frame is near-square because its hero renders are. Ours are 16:9
+     landscape, and object-fit:cover was cropping the sides — which cut the floor mirror off the
+     right wall, i.e. the one thing the frame exists to show.
+     Two rules are needed, not one: marketing.css pins .stage3 to min-height 540px above 941px
+     and gives the frame `flex: 1 1 auto`, so the frame stretched to fill and aspect-ratio was
+     ignored. Release the height, then let the ratio hold the shape. */
+  .stage3__frame { aspect-ratio: 16 / 9; min-height: 0; flex: 0 0 auto; }
+  @media (min-width: 941px) { .mkt-hero__media > .stage3 { height: auto; min-height: 0; } }
+  /* The Studio parks the quote card bottom-RIGHT, which is empty floor in its hero. In ours the
+     product IS on the right wall, so the card was covering the mirror it is meant to price. */
+  .stage3__quote { right: auto; left: var(--sp-4, 16px); }
   .mkt-limits { border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; background: var(--paper); }
   @media (max-width: 760px) { .mkt-limits { padding: 18px; } }
 </style>
@@ -40,9 +46,9 @@
     </a>
     <div class="mkt-nav__links">
       <div class="mkt-nav__linkset">
+        <a href="#problem">Why it matters</a>
         <a href="#how">How it works</a>
-        <a href="#quote">The quote</a>
-        <a href="#limits">Honest limits</a>
+        <a href="#gallery">Gallery</a>
       </div>
       <a class="mkt-btn mkt-btn--primary" href="/demo/">Try the live demo</a>
     </div>
@@ -66,12 +72,37 @@
         Free to try · No login · Nothing edited in your theme
       </p>
     </div>
+    <!-- AL B: the hero was a phone video letterboxed in a landscape frame with a third of the
+         width empty. It now shows the OUTPUT in the first viewport, on the Studio's stage3
+         pattern: a real render with the itemised quote overlaid, and a stepper beneath.
+         Two states, not the Studio's three — the plugin genuinely has two (their room, their
+         room with your product in it). A third would mean inventing an image.
+         Both frames are the render Harsh approved on 30 Oct through the live /demo page. -->
     <div class="mkt-hero__media">
-      <video class="mkt-hero__video" autoplay muted loop playsinline preload="metadata"
-             poster="/media/walkthrough-poster.jpg" controls>
-        <source src="/media/walkthrough-1280.mp4" type="video/mp4">
-      </video>
-      <p class="mkt-vnote">The whole thing, start to finish — about a minute. Captions are burned in; sound is optional.</p>
+      <div class="stage3" id="stage">
+        <div class="stage3__frame">
+          <picture class="stage3__pic" data-stage="0" style="opacity:1">
+            <img class="stage3__img" src="/media/renders/hero_before.jpg" alt="A customer's own bedroom, photographed on a phone" decoding="async">
+          </picture>
+          <picture class="stage3__pic" data-stage="1" style="opacity:0">
+            <img class="stage3__img" src="/media/renders/hero_after.jpg" alt="The same bedroom with a floor mirror from the catalogue standing against the right wall at its real size" loading="lazy" decoding="async" aria-hidden="true">
+          </picture>
+          <span class="stage3__badge"><span class="stage3__badge-n">1</span><span id="stageLabel">Their room</span></span>
+          <div class="stage3__quote" id="stageQuote" aria-hidden="true" hidden>
+            <div class="stage3__quote-h">Itemised quote · in ₹</div>
+            <div class="stage3__row"><span>Versailles floor mirror</span><span>₹24,140</span></div>
+            <div class="stage3__total"><b>Total</b><b>₹24,140</b></div>
+          </div>
+        </div>
+        <div class="stage3__control">
+          <input class="stage3__range" type="range" min="0" max="1" step="1" value="0" id="stageRange"
+                 aria-label="Step through the two states: their room, then their room with your product in it">
+          <div class="stage3__steps">
+            <button type="button" class="stage3__step is-active" data-go="0"><span class="stage3__step-n">1</span><span class="stage3__step-l">Their room</span></button>
+            <button type="button" class="stage3__step" data-go="1"><span class="stage3__step-n">2</span><span class="stage3__step-l">Your product in it</span></button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </header>
@@ -83,7 +114,7 @@
       <li>Real catalogue SKUs</li>
       <li>Quotes in ₹</li>
       <li>From a phone photo</li>
-      <li>No showroom needed</li>
+      <li>Nothing edited in your theme</li>
     </ul>
   </div>
 </section>
@@ -117,10 +148,13 @@
         a product shot cannot: their own room, with your piece in it.
       </p>
     </div>
+    <!-- AL A: this was a 2x2 with three cards and an empty grey cell, which reads as broken.
+         The fourth is modelled on the Studio's "A closing tool for sales & designers". -->
     <div class="mkt-outcomes">
-      <article class="mkt-outcome"><div class="mkt-outcome__ic">↗</div><h3>Fewer abandoned carts</h3><p>The doubt that stops the order is answered on the page, not after a support email.</p></article>
+      <article class="mkt-outcome"><div class="mkt-outcome__ic">↗</div><h3>More orders from the same traffic</h3><p>The doubt that stops the order is answered on the page, not after a support email. No extra ad spend.</p></article>
       <article class="mkt-outcome"><div class="mkt-outcome__ic">↺</div><h3>Fewer returns</h3><p>They have already seen the real size in their real room before they pay.</p></article>
       <article class="mkt-outcome"><div class="mkt-outcome__ic">₹</div><h3>Bigger baskets</h3><p>A staged room is a room with more than one thing in it, and every line has a buy link.</p></article>
+      <article class="mkt-outcome"><div class="mkt-outcome__ic">◱</div><h3>A closing tool for your team</h3><p>Sales and WhatsApp enquiries get a finished render and a priced quote to send back, instead of a catalogue link.</p></article>
     </div>
   </div>
 </section>
@@ -129,8 +163,10 @@
   <div class="mkt-wrap">
     <div class="mkt-sect-head">
       <p class="mkt-eyebrow">How it works</p>
-      <h2 class="mkt-h2">One room, four steps</h2>
-      <p class="mkt-sectlead">From your customer&rsquo;s phone photo to a priced room — in about thirty seconds.</p>
+      <!-- AL E: the nav label and the heading said different things. Same words now; the old
+           heading survives as the lead, where it reads as a subtitle rather than a contradiction. -->
+      <h2 class="mkt-h2">How it works</h2>
+      <p class="mkt-sectlead">One room, four steps — from your customer&rsquo;s phone photo to a priced room in about thirty seconds.</p>
     </div>
     <div class="mkt-how__grid">
       <article class="mkt-step">
@@ -153,6 +189,56 @@
         <h3>An itemised quote in ₹</h3>
         <p>With a link straight to your product page.</p>
       </article>
+    </div>
+  </div>
+</section>
+
+<section id="gallery" class="mkt-section">
+  <div class="mkt-wrap">
+    <div class="mkt-sect-head mkt-sect-head--center">
+      <p class="mkt-eyebrow">Real renders</p>
+      <h2 class="mkt-h2">One of each kind of placement.</h2>
+      <p class="mkt-sectlead">
+        Every pair below is a real room photo and the render the plugin returned for it. Nothing
+        is staged twice and nothing is retouched.
+      </p>
+    </div>
+    <!-- AL C: one render per placement class, all three verified before publishing.
+         The floor-standing-bowl renders and the mis-sized cabinet are deliberately NOT here. -->
+    <div class="mkt-gallery__grid">
+      <figure class="mkt-gcard">
+        <img src="/media/renders/g_bowl_after.jpg" alt="A living room with a blue chinoiserie fruit bowl placed on the marble coffee table" loading="lazy" decoding="async">
+        <img class="mkt-gcard__before" src="/media/renders/g_bowl_before.jpg" alt="The same living room before, without the bowl" loading="lazy" decoding="async">
+        <figcaption class="mkt-gcard__label">On a surface · bowl on a coffee table</figcaption>
+      </figure>
+      <figure class="mkt-gcard">
+        <img src="/media/renders/g_mirror_after.jpg" alt="A bedroom with a tall distressed floor mirror leaning against the right wall" loading="lazy" decoding="async">
+        <img class="mkt-gcard__before" src="/media/renders/g_mirror_before.jpg" alt="The same bedroom before, without the mirror" loading="lazy" decoding="async">
+        <figcaption class="mkt-gcard__label">Against a wall · floor mirror</figcaption>
+      </figure>
+      <figure class="mkt-gcard">
+        <img src="/media/renders/g_table_after.jpg" alt="A bedroom where the bedside table has been swapped for an ornamental blue-and-white pedestal side table" loading="lazy" decoding="async">
+        <img class="mkt-gcard__before" src="/media/renders/g_table_before.jpg" alt="The same bedroom before, with the original bedside table" loading="lazy" decoding="async">
+        <figcaption class="mkt-gcard__label">In place of something · side table swap</figcaption>
+      </figure>
+    </div>
+    <p class="mkt-sectlead" style="text-align:center;margin-top:18px">Hover or tap a render to see the room it started from.</p>
+  </div>
+</section>
+
+<section id="video" class="mkt-section mkt-band--ink">
+  <div class="mkt-wrap">
+    <div class="mkt-sect-head">
+      <p class="mkt-eyebrow">See it in action</p>
+      <h2 class="mkt-h2">Watch the walkthrough</h2>
+      <p class="mkt-sectlead">One product page, one phone photo, one priced room — start to finish, about a minute.</p>
+    </div>
+    <!-- AL B: moved out of the hero, where it was letterboxed and left a third of the frame empty. -->
+    <div class="mkt-video__frame">
+      <video class="mkt-video__el" muted loop playsinline preload="none"
+             poster="/media/walkthrough-poster.jpg" controls>
+        <source src="/media/walkthrough-1280.mp4" type="video/mp4">
+      </video>
     </div>
   </div>
 </section>
@@ -226,12 +312,11 @@
       <a class="mkt-brand" href="#top"><span class="mkt-brand__mark">G</span><span class="mkt-brand__name">Gruha</span></a>
       <p class="mkt-footer__meta" style="margin-top:12px">&ldquo;See it in your room&rdquo; for furniture &amp; décor brands · Made in India</p>
     </div>
+    <!-- AL D: the footer carried a link the header did not. One set, both places. -->
     <div class="mkt-footer__links">
       <a href="#problem">Why it matters</a>
       <a href="#how">How it works</a>
-      <a href="#quote">The quote</a>
-      <a href="#limits">Honest limits</a>
-      <a href="/demo/">Live demo</a>
+      <a href="#gallery">Gallery</a>
     </div>
   </div>
   <div class="mkt-wrap" style="margin-top:22px">
@@ -239,5 +324,51 @@
   </div>
 </footer>
 
+<script>
+// AL B — the hero stepper. The Studio's StageSlider in plain JS: auto-advance until the visitor
+// takes control, pause when off-screen, and respect prefers-reduced-motion.
+(function () {
+  var root = document.getElementById('stage'); if (!root) return;
+  var pics = root.querySelectorAll('.stage3__pic');
+  var steps = root.querySelectorAll('.stage3__step');
+  var range = document.getElementById('stageRange');
+  var label = document.getElementById('stageLabel');
+  var badgeN = root.querySelector('.stage3__badge-n');
+  var quote = document.getElementById('stageQuote');
+  var LABELS = ['Their room', 'Your product in it'];
+  var stage = 0, took = false, inView = true;
+
+  function paint(i) {
+    stage = i;
+    for (var p = 0; p < pics.length; p++) {
+      var on = Number(pics[p].dataset.stage) === i;
+      pics[p].style.opacity = on ? 1 : 0;
+      pics[p].querySelector('img').setAttribute('aria-hidden', String(!on));
+    }
+    for (var b = 0; b < steps.length; b++) {
+      var act = Number(steps[b].dataset.go) === i;
+      steps[b].classList.toggle('is-active', act);
+      steps[b].setAttribute('aria-pressed', String(act));
+    }
+    range.value = i; label.textContent = LABELS[i]; badgeN.textContent = i + 1;
+    // The quote belongs to the rendered state — it is what the plugin returns with the image.
+    if (i > 0) quote.removeAttribute('hidden'); else quote.setAttribute('hidden', '');
+  }
+  function take(i) { took = true; paint(i); }
+  for (var b = 0; b < steps.length; b++) {
+    (function (el) { el.addEventListener('click', function () { take(Number(el.dataset.go)); }); })(steps[b]);
+  }
+  range.addEventListener('input', function () { take(Number(range.value)); });
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduce) {
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (e) { inView = e[0].isIntersecting; }, { threshold: 0.3 }).observe(root);
+    }
+    setInterval(function () { if (!took && inView) paint((stage + 1) % LABELS.length); }, 3200);
+  }
+  paint(0);
+})();
+</script>
 </body>
 </html>
