@@ -32,6 +32,10 @@
   /* The Studio parks the quote card bottom-RIGHT, which is empty floor in its hero. In ours the
      product IS on the right wall, so the card was covering the mirror it is meant to price. */
   .stage3__quote { right: auto; left: var(--sp-4, 16px); }
+  /* marketing.css reveals .mkt-gcard__before on :hover / :focus-visible only. A <figure> is not
+     focusable and a phone has no hover, so on mobile the "before" would never appear at all.
+     Show it outright wherever hover is unavailable. */
+  @media (hover: none) { .mkt-gcard__before { opacity: 1; transform: none; } }
   .mkt-limits { border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; background: var(--paper); }
   @media (max-width: 760px) { .mkt-limits { padding: 18px; } }
 </style>
@@ -222,7 +226,7 @@
         <figcaption class="mkt-gcard__label">In place of something · side table swap</figcaption>
       </figure>
     </div>
-    <p class="mkt-sectlead" style="text-align:center;margin-top:18px">Hover or tap a render to see the room it started from.</p>
+    <p class="mkt-sectlead" style="text-align:center;margin-top:18px">The inset on each card is the room it started from — shown on touch, revealed on hover.</p>
   </div>
 </section>
 
