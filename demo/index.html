@@ -155,8 +155,11 @@ nav{font-size:13px;color:var(--muted);display:flex;gap:18px;flex-wrap:wrap}
         <div class="cta">Open to <b>see it in your room</b></div>
       </a>
   </div>
-  <div class="foot">Real products and live prices from <b>a live Indian décor catalogue</b> ·
-    one &lt;script&gt; tag per product page · renders on Gruha's server.<br>Powered by <b>Gruha</b>.</div>
+  <!-- T-1: this is a SHOPPER-facing footer. It used to carry "one <script> tag per product page
+       · renders on Gruha's server" with raw angle brackets — a developer pitch inside the
+       shopping illusion. That claim belongs on the landing page, and is there. -->
+  <div class="foot">Real products and live prices from <b>a live Indian décor catalogue</b>.
+    <br>Powered by <b>Gruha</b>.</div>
 </div>
 <script src="/v15/embed.js" data-gruha-key="gk_demo_dkart_2f9a4e6b1c83"
   data-endpoint="https://txkxblempgconaeplqde.supabase.co/functions/v1/embed-render" data-currency="INR" async></script>

@@ -45,6 +45,19 @@
     klass: script.getAttribute('data-product-class') || '',
   }
   if (!cfg.key || !cfg.endpoint) { console.warn('[Gruha] missing data-gruha-key or data-endpoint'); return }
+
+  // ---------------------------------------------------------------- T-6: a test hook, opt-in
+  // N-3, 2 Nov: NOTHING could drive this widget. The file input lives in a shadow root and is
+  // display:none, so find()/read_page() and the accessibility tree all return nothing, and the
+  // only way to exercise a real upload was to bridge a light-DOM input and hand the File across
+  // with DataTransfer. That is WHY the eight-day g-step nesting bug survived eight days: no
+  // harness could reach the path where it failed.
+  //
+  // Set window.__GRUHA_TEST__ = true BEFORE the script loads and the host element gets
+  // __gruha: { root, setPhoto(file), state() }. It is opt-in and absent otherwise, so nothing
+  // ships to shoppers. The smoke test that uses it asserts the rendered PIXEL — result <img>
+  // naturalWidth > 0 — not the HTTP response, because the response was fine for eight days
+  // while the picture never reached the screen.
   // A product is OPTIONAL: on non-product pages the script still loads so the "Your Look" pill
   // follows the shopper around the store. Without a product we mount the pill only.
   var hasProduct = !!(product && product.image_url)
@@ -93,6 +106,36 @@
   host.style.setProperty('display', 'block', 'important')
   document.body.appendChild(host)
   var root = host.attachShadow({ mode: 'open' })
+
+  // T-6 — see the note above. Opt-in only; absent unless the page sets the flag before load.
+  if (window.__GRUHA_TEST__) {
+    host.__gruha = {
+      root: root,
+      // the real path: put a File on the shadow input and fire the event the widget listens for
+      setPhoto: function (file) {
+        var inp = root.querySelector('.g-file')
+        if (!inp) throw new Error('[Gruha test] .g-file is not in the shadow root yet — open the panel first')
+        var dt = new DataTransfer(); dt.items.add(file); inp.files = dt.files
+        inp.dispatchEvent(new Event('change', { bubbles: true }))
+        return true
+      },
+      // what a test should assert on. renderedWidth is the PIXEL: it was 0 for eight days while
+      // the HTTP response was a clean 200.
+      state: function () {
+        var img = root.querySelector('.g-res img')
+        var shown = function (sel) { var e = root.querySelector(sel); return !!e && getComputedStyle(e).display !== 'none' }
+        var txt = function (sel) { var e = root.querySelector(sel); return e ? (e.textContent || '').trim() : '' }
+        return {
+          step: ['upload', 'load', 'res', 'err'].filter(function (k) { return shown('.g-step-' + k) })[0] || null,
+          renderedWidth: img ? img.naturalWidth : 0,
+          renderedHeight: img ? img.naturalHeight : 0,
+          resultHeight: (function () { var e = root.querySelector('.g-step-res'); return e ? e.clientHeight : 0 })(),
+          error: txt('.g-err'),
+          quote: txt('.g-quote'),
+        }
+      },
+    }
+  }
 
   var CSS = '\
   :host{all:initial}\
@@ -231,7 +274,7 @@
           // no spinner, no render, no quote, and no error either. Verified in the PRISTINE DOM
           // with no interaction: .g-bd had three children instead of six.
           '</div>' +
-          '<div class="g-step g-step-load" style="display:none"><div class="g-spin"><div class="g-dot"></div><div>Staging your room… this usually takes 30–45 seconds</div></div></div>' +
+          '<div class="g-step g-step-load" style="display:none"><div class="g-spin"><div class="g-dot"></div><div class="g-loadmsg">Staging your room… this usually takes about a minute</div></div></div>' +
           '<div class="g-step g-step-res" style="display:none">' +
             '<div class="g-res"><img alt="your room with the product"></div>' +
             '<div class="g-quote"></div>' +
@@ -479,8 +522,15 @@
   // the SAME room, so the shopper never leaves the view or re-uploads; it is a normal render and
   // meters as one.
   var inFlight = false
+  var loadTimer = null
+  var LOAD_1 = 'Staging your room… this usually takes about a minute'
+  var LOAD_2 = 'Still working — this one is taking longer than usual.'
+  function loadMsg (t) { var e = $('.g-loadmsg'); if (e) e.textContent = t }
   function postRender (prod) {
     show('load')
+    loadMsg(LOAD_1)
+    clearTimeout(loadTimer)
+    loadTimer = setTimeout(function () { loadMsg(LOAD_2) }, 80000)
     var headers = { 'Content-Type': 'application/json' }
     if (cfg.apikey) { headers['apikey'] = cfg.apikey; headers['Authorization'] = 'Bearer ' + cfg.apikey }
     return fetch(cfg.endpoint, {
@@ -497,11 +547,12 @@
     })
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j } }) })
       .then(function (res) {
+        clearTimeout(loadTimer)
         if (!res.ok || !res.j.renderDataUrl) throw new Error((res.j && res.j.error) || 'Preview failed — please try again.')
         inFlight = false
         renderResult(res.j, prod)
       })
-      .catch(function (e) { inFlight = false; $('.g-err').textContent = e.message || 'Preview failed — please try again.'; show('err') })
+      .catch(function (e) { clearTimeout(loadTimer); inFlight = false; $('.g-err').textContent = e.message || 'Preview failed — please try again.'; show('err') })
   }
 
   // A rapid double-tap must never buy two renders. Observed behaviour was already one render per
