@@ -305,13 +305,21 @@
     <div class="mkt-sect-head">
       <p class="mkt-eyebrow">See it in action</p>
       <h2 class="mkt-h2">Watch the walkthrough</h2>
-      <p class="mkt-sectlead">One product page, one phone photo, one priced room — start to finish, about a minute.</p>
+      <p class="mkt-sectlead">One product page, one room photo, one priced room — start to finish, in forty-five seconds.</p>
     </div>
-    <!-- AL B: moved out of the hero, where it was letterboxed and left a third of the frame empty. -->
+    <!-- AL B: moved out of the hero, where it was letterboxed and left a third of the frame empty.
+         2 Nov: now the v3 film. Two things had to change with it.
+         `muted` would have silenced a narrated film — v3 carries a Hume voice-over and a music
+         bed, and a silent play would have looked like the walkthrough had nothing to say. `loop`
+         went with it: looping a 46-second narrated piece restarts the voice mid-thought.
+         The file is VERSIONED in the src. The Supabase Storage upload earlier today returned 200
+         while the plain URL kept serving the old object, and a cached mp4 would fail the same
+         way — a new name cannot be served stale. walkthrough-1280.mp4 is ALSO overwritten with
+         the same film, so any link already sent out resolves to the new one. -->
     <div class="mkt-video__frame">
-      <video class="mkt-video__el" muted loop playsinline preload="none"
+      <video class="mkt-video__el" playsinline preload="none"
              poster="/media/walkthrough-poster.jpg" controls>
-        <source src="/media/walkthrough-1280.mp4" type="video/mp4">
+        <source src="/media/walkthrough-v3-1280.mp4" type="video/mp4">
       </video>
     </div>
   </div>
