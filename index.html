@@ -40,6 +40,9 @@
   /* AL2 — the gallery card is 3/2 in the Studio because its renders are. Ours are 16:9, so
      object-fit:cover was eating the sides, which is where the floor mirror stands. */
   .mkt-gcard { aspect-ratio: 16 / 9; }
+  /* the multi-product card is the gallery's point, not a fifth of five: full width, and no
+     empty cell left beside it */
+  .mkt-gcard--wide { grid-column: 1 / -1; }
 
   /* AL2 — the stepper. The two step buttons were auto-width, so they were unequal and narrower
      than the image above them. Equal columns, spanning exactly the frame's width, text on one
@@ -91,6 +94,20 @@
   @media (max-width: 720px) {
     .mkt-gcard__label { right: var(--sp-5); font-size: 15px; line-height: 1.3; }
   }
+  /* The native control bar puts play in the BOTTOM-LEFT corner, which is a small target in a
+     1080px-wide frame and not where anyone looks first. A centred button over the poster is the
+     obvious affordance; the native controls stay for scrubbing once it is running. */
+  .mkt-video__play { position: absolute; inset: 0; margin: auto; width: 96px; height: 96px;
+    display: grid; place-items: center; border: 0; border-radius: 999px; cursor: pointer;
+    background: color-mix(in srgb, #fffdf9 94%, transparent); color: var(--ink);
+    box-shadow: 0 18px 46px rgba(0,0,0,.45); z-index: 3;
+    transition: transform .22s ease, background .22s ease; }
+  .mkt-video__play:hover { transform: scale(1.07); background: #fff; }
+  .mkt-video__play:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+  .mkt-video__play svg { margin-left: 6px; }
+  .mkt-video__play[hidden] { display: none !important; }
+  @media (max-width: 720px) { .mkt-video__play { width: 72px; height: 72px; } }
+
   .mkt-limits { border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; background: var(--paper); }
   @media (max-width: 760px) { .mkt-limits { padding: 18px; } }
 </style>
@@ -256,7 +273,7 @@
   <div class="mkt-wrap">
     <div class="mkt-sect-head mkt-sect-head--center">
       <p class="mkt-eyebrow">Real renders</p>
-      <h2 class="mkt-h2">One of each kind of placement, and one of size.</h2>
+      <h2 class="mkt-h2">One of each kind of placement — and all of them at once.</h2>
       <p class="mkt-sectlead">
         Every pair below is a real room photo and the render the plugin returned for it. Nothing
         is staged twice and nothing is retouched.
@@ -295,6 +312,20 @@
         <span class="mkt-gcard__zoom" aria-hidden="true">⤢</span>
         <figcaption class="mkt-gcard__label">At its real size · entryway console</figcaption>
       </figure>
+      <!-- AL4: multiple products in ONE render, which is what "Your Look" actually does and what
+           none of the four single-product cards shows. It SPANS both columns: a fifth card in a
+           two-column grid would leave the empty cell the fourth card was added to fill.
+           Four Sirohi pieces staged into one bedroom in a single pass -- jute round mirror on the
+           wall, chevron planter by the window, Jamun basket at the foot of the bed, tealights on
+           the nightstand. The positions were measured by diffing this exact pair and checking
+           each crop against the product it was assumed to be (see spots.ts in the walkthrough
+           project); at full frame they are 1.45%, 1.35%, 1.01% and 0.30% of the picture. -->
+      <figure class="mkt-gcard mkt-gcard--wide" role="button" tabindex="0" data-g="look" aria-label="Enlarge: Four pieces at once · one bedroom">
+        <img src="/media/renders/g_look_after.jpg" alt="A bedroom with four décor pieces added in one render: a jute round mirror on the wall, a chevron planter by the window, a woven basket at the foot of the bed and tealight holders on the nightstand" loading="lazy" decoding="async">
+        <img class="mkt-gcard__before" src="/media/renders/g_look_before.jpg" alt="The same bedroom before, without any of the four pieces" loading="lazy" decoding="async">
+        <span class="mkt-gcard__zoom" aria-hidden="true">⤢</span>
+        <figcaption class="mkt-gcard__label">Four pieces at once · one bedroom</figcaption>
+      </figure>
     </div>
     <p class="mkt-sectlead mkt-lead--center" style="margin:18px auto 0;text-align:center">Tap any render to see it full size, and to flip between the room before and after.</p>
   </div>
@@ -317,10 +348,13 @@
          way — a new name cannot be served stale. walkthrough-1280.mp4 is ALSO overwritten with
          the same film, so any link already sent out resolves to the new one. -->
     <div class="mkt-video__frame">
-      <video class="mkt-video__el" playsinline preload="none"
+      <video id="wv" class="mkt-video__el" playsinline preload="none"
              poster="/media/walkthrough-poster.jpg" controls>
         <source src="/media/walkthrough-v3-1280.mp4" type="video/mp4">
       </video>
+      <button class="mkt-video__play" id="wvPlay" type="button" aria-label="Play the walkthrough">
+        <svg width="34" height="38" viewBox="0 0 34 38" aria-hidden="true"><path d="M2 2.6 32 19 2 35.4Z" fill="currentColor"/></svg>
+      </button>
     </div>
   </div>
 </section>
@@ -446,6 +480,21 @@
   paint(0);
 })();
 
+// AL4 — the centred play button. The native control bar's play sits bottom-left, which is a
+// small target and not where the eye goes. This overlays the poster, hands off to the real
+// <video> on click, and gets out of the way; the native controls do everything after that.
+// It comes back at the end so a second viewing does not need the control bar either.
+(function () {
+  var v = document.getElementById('wv'), btn = document.getElementById('wvPlay');
+  if (!v || !btn) return;
+  btn.addEventListener('click', function () {
+    var p = v.play();
+    if (p && p.catch) p.catch(function () { /* blocked: leave the button up */ });
+  });
+  v.addEventListener('play', function () { btn.hidden = true; });
+  v.addEventListener('ended', function () { btn.hidden = false; });
+})();
+
 // AL2 — the gallery lightbox, the Studio's pattern in plain JS. The card crops to 16:9; this
 // shows the render whole (object-fit: contain) and flips to the room it started from.
 (function () {
@@ -453,7 +502,8 @@
     bowl:   { a: '/media/renders/g_bowl_after.jpg',   b: '/media/renders/g_bowl_before.jpg',   c: 'On a surface · bowl on a coffee table' },
     mirror: { a: '/media/renders/g_mirror_after.jpg', b: '/media/renders/g_mirror_before.jpg', c: 'Against a wall · floor mirror' },
     table:  { a: '/media/renders/g_table_after.jpg',  b: '/media/renders/g_table_before.jpg',  c: 'In place of something · side table swap' },
-    console:{ a: '/media/renders/g_console_after.jpg',b: '/media/renders/g_console_before.jpg',c: 'At its real size · entryway console' }
+    console:{ a: '/media/renders/g_console_after.jpg',b: '/media/renders/g_console_before.jpg',c: 'At its real size · entryway console' },
+    look:   { a: '/media/renders/g_look_after.jpg',   b: '/media/renders/g_look_before.jpg',   c: 'Four pieces at once · one bedroom' }
   };
   var lb = document.getElementById('lb'), img = document.getElementById('lbImg');
   var tag = document.getElementById('lbTag'), cap = document.getElementById('lbCap');
