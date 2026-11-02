@@ -60,6 +60,37 @@
   /* the caption sat on one line with the toggle and clipped off the right edge on narrow
      viewports; let the row wrap instead. */
   .mkt-lightbox__toggle { flex-wrap: wrap; }
+  /* AL3 — the CTA fine print, two separate faults.
+     COLOUR: marketing.css has no base `a` rule at all, so this link fell back to the browser's
+     default blue (#0000EE) sitting on a near-black band — unreadable, and the only thing on the
+     page still wearing a default style.
+     ONE LINE: `.mkt-cta p` is max-width:44ch, which at this 13px size is about 277px, so a
+     65-character sentence broke in two. The override has to carry the type selector too --
+     `.mkt-cta p` is (0,1,1) and a lone `.mkt-cta__fine` is (0,1,0), so the first attempt lost on
+     specificity and the width never released. Measured, not assumed: counted with Range rects,
+     because getClientRects() on a block <p> returns one rect no matter how many lines it has. */
+  .mkt-cta p.mkt-cta__fine { max-width: none; }
+  /* The colour half is NOT a CTA problem, it is a missing base rule, and the footer's "What it
+     can and can't do" proved it by sitting there in the same browser blue. Patching the two
+     known links one at a time is how the third one gets missed. Prose links -- any unclassed
+     link inside a <p> or <li>, which is where prose links live and where the nav's never are --
+     take the colour of the text around them on any band, and are marked by an underline. */
+  .mkt p a:not([class]), .mkt li a:not([class]) {
+    color: inherit; text-decoration: underline; text-underline-offset: 3px;
+    text-decoration-color: color-mix(in srgb, currentColor 42%, transparent); }
+  .mkt p a:not([class]):hover, .mkt p a:not([class]):focus-visible,
+  .mkt li a:not([class]):hover { text-decoration-color: currentColor; }
+  /* The CTA band's fine print is grey-on-black; its link should be the brighter on-ink white,
+     not inherit the grey. */
+  .mkt-cta p.mkt-cta__fine a { color: var(--on-ink); }
+
+  /* AL3 — the gallery label is 20px because the Studio's cards are 580px wide. At phone width
+     the card is 270px, so three of the four labels wrapped to two lines AND ran to the card's
+     right edge with no gutter at all (measured: overflowRight 0). Smaller type, and a right
+     bound so a wrap happens inside the card rather than against its edge. */
+  @media (max-width: 720px) {
+    .mkt-gcard__label { right: var(--sp-5); font-size: 15px; line-height: 1.3; }
+  }
   .mkt-limits { border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; background: var(--paper); }
   @media (max-width: 760px) { .mkt-limits { padding: 18px; } }
 </style>
@@ -225,14 +256,20 @@
   <div class="mkt-wrap">
     <div class="mkt-sect-head mkt-sect-head--center">
       <p class="mkt-eyebrow">Real renders</p>
-      <h2 class="mkt-h2">One of each kind of placement.</h2>
+      <h2 class="mkt-h2">One of each kind of placement, and one of size.</h2>
       <p class="mkt-sectlead">
         Every pair below is a real room photo and the render the plugin returned for it. Nothing
         is staged twice and nothing is retouched.
       </p>
     </div>
-    <!-- AL C: one render per placement class, all three verified before publishing.
-         The floor-standing-bowl renders and the mis-sized cabinet are deliberately NOT here. -->
+    <!-- AL C: one render per placement class, all verified before publishing.
+         The floor-standing-bowl renders and the mis-sized cabinet are deliberately NOT here.
+         AL3: fourth card added (3 cards left an empty cell in a 2-col grid). It is the entryway
+         console, the render that proves a swap does NOT inherit the old piece's footprint:
+         ~108 cm against a stated 106 cm, 28% narrower than the console it replaced. The two bar
+         cart renders were the other candidates and were REJECTED by eye -- r6's whole-frame diff
+         is 3.73% against a 4.4 noise floor (the cart was already in the room) and r5 is cut by
+         the frame edge. -->
     <div class="mkt-gallery__grid">
       <figure class="mkt-gcard" role="button" tabindex="0" data-g="bowl" aria-label="Enlarge: On a surface · bowl on a coffee table">
         <img src="/media/renders/g_bowl_after.jpg" alt="A living room with a blue chinoiserie fruit bowl placed on the marble coffee table" loading="lazy" decoding="async">
@@ -251,6 +288,12 @@
         <img class="mkt-gcard__before" src="/media/renders/g_table_before.jpg" alt="The same bedroom before, with the original bedside table" loading="lazy" decoding="async">
         <span class="mkt-gcard__zoom" aria-hidden="true">⤢</span>
         <figcaption class="mkt-gcard__label">In place of something · side table swap</figcaption>
+      </figure>
+      <figure class="mkt-gcard" role="button" tabindex="0" data-g="console" aria-label="Enlarge: At its real size · entryway console">
+        <img src="/media/renders/g_console_after.jpg" alt="An entryway where the dark wooden console has been swapped for a white carved console, rendered about 108 cm wide against a stated 106 cm — narrower than the piece it replaced, with floor and wall visible at its right end" loading="lazy" decoding="async">
+        <img class="mkt-gcard__before" src="/media/renders/g_console_before.jpg" alt="The same entryway before, with the original dark wooden console" loading="lazy" decoding="async">
+        <span class="mkt-gcard__zoom" aria-hidden="true">⤢</span>
+        <figcaption class="mkt-gcard__label">At its real size · entryway console</figcaption>
       </figure>
     </div>
     <p class="mkt-sectlead mkt-lead--center" style="margin:18px auto 0;text-align:center">Tap any render to see it full size, and to flip between the room before and after.</p>
@@ -312,9 +355,7 @@
     <p>Pick any piece, upload a photo of a room you know, and judge the result yourself.</p>
     <div><a class="mkt-btn mkt-btn--primary" href="/demo/">Try the live demo →</a></div>
     <!-- AL2: this repeated the hero's trust line word for word. One line, not two claims twice. -->
-    <p class="mkt-cta__fine">It&rsquo;s a visualisation, not a photograph —
-      <a href="/honest-limits/">what it can and can&rsquo;t do</a>.</p>
-    <p class="mkt-cta__fine">Prefer email? Just reply to my message.</p>
+    <p class="mkt-cta__fine">It&rsquo;s a visualisation, not a photograph — <a href="/honest-limits/">what it can and can&rsquo;t do</a>.</p>
   </div>
 </section>
 
@@ -403,7 +444,8 @@
   var G = {
     bowl:   { a: '/media/renders/g_bowl_after.jpg',   b: '/media/renders/g_bowl_before.jpg',   c: 'On a surface · bowl on a coffee table' },
     mirror: { a: '/media/renders/g_mirror_after.jpg', b: '/media/renders/g_mirror_before.jpg', c: 'Against a wall · floor mirror' },
-    table:  { a: '/media/renders/g_table_after.jpg',  b: '/media/renders/g_table_before.jpg',  c: 'In place of something · side table swap' }
+    table:  { a: '/media/renders/g_table_after.jpg',  b: '/media/renders/g_table_before.jpg',  c: 'In place of something · side table swap' },
+    console:{ a: '/media/renders/g_console_after.jpg',b: '/media/renders/g_console_before.jpg',c: 'At its real size · entryway console' }
   };
   var lb = document.getElementById('lb'), img = document.getElementById('lbImg');
   var tag = document.getElementById('lbTag'), cap = document.getElementById('lbCap');
