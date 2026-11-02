@@ -223,6 +223,14 @@
             '<div class="g-hand" style="display:none"></div>' +
             '<button class="g-cta" disabled>Generate</button>' +
           '</div>' +
+          // 2 Nov: `.g-step-upload` was NEVER CLOSED. The block opens 8 <div>s and closes 7, so
+          // the one '</div>' above closes `.g-tips` and the parser then nests g-step-load,
+          // g-step-res and g-step-err INSIDE g-step-upload. show('res') sets upload to
+          // display:none -- which took the result down with it. On the live demo a shopper
+          // ticked consent, uploaded, pressed Generate, and the panel collapsed to its header:
+          // no spinner, no render, no quote, and no error either. Verified in the PRISTINE DOM
+          // with no interaction: .g-bd had three children instead of six.
+          '</div>' +
           '<div class="g-step g-step-load" style="display:none"><div class="g-spin"><div class="g-dot"></div><div>Staging your room… this usually takes 30–45 seconds</div></div></div>' +
           '<div class="g-step g-step-res" style="display:none">' +
             '<div class="g-res"><img alt="your room with the product"></div>' +
