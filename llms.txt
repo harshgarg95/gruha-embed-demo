@@ -1,0 +1,44 @@
+# Gruha
+
+> Gruha is a "See it in your room" button for furniture and décor brands' product pages. A shopper uploads a photo of their own room, and the product appears in it at its real size, lit by the room's own light, with an itemised price in ₹ and a link straight to the brand's checkout. It runs on the product photos already on the brand's site, so no 3D models are needed. It is a Shopify app, and one script tag for WooCommerce or any other website.
+
+Gruha is made in India (Hyderabad). It is an AI render of a photo of the shopper's own room, not augmented reality.
+
+## Who it is for
+
+- Furniture and home-décor brands selling online, and their e-commerce teams
+- Sales and WhatsApp teams, who can send back a finished render and a priced quote instead of a catalogue link
+
+## How it works
+
+1. One button on the product page, switched on from the theme editor. Nothing in the theme is edited.
+2. The customer uploads a photo of the room they are buying for, bare or already lived-in, from the phone camera or gallery.
+3. The product appears in it at its real size, lit by the light already in that room. It takes about a minute.
+4. An itemised quote in ₹, with a buy link to the product page.
+
+Several products can be placed in one room, with colour and fabric variants. Shoppers can share the render on WhatsApp or download it. Brands get a live usage dashboard, the most-visualised products and a CSV export. Consent is taken before any photo is sent, and photos are deleted after 90 days.
+
+## Pricing
+
+- Starter: ₹4,999 per month, 5,000 credits (about 125 renders)
+- Growth: ₹9,999 per month, 10,000 credits (about 250 renders)
+- White-label: ₹17,999 per month, 10,000 credits (250 renders), no Gruha badge
+- One credit is ₹1; one render is 40 credits; a failed render is free. Top-ups are the same rate and never expire. Cancel any time. Prices exclude GST.
+
+## Main pages
+
+- [Home](https://room.gruhalabs.com/): what it does, how it works, real renders and the walkthrough video
+- [Pricing and how we start](https://room.gruhalabs.com/plans/): plans, credits, onboarding steps and data retention
+- [What it can and can't do](https://room.gruhalabs.com/honest-limits/): the honest limits
+- [Live demo](https://room.gruhalabs.com/demo/): a demo storefront on a real Indian décor catalogue; no login
+
+## Honest limits
+
+- It is a visualisation, not a photograph.
+- A daylit indoor photo gives a much better result than a dim or outdoor one.
+- When a room has nowhere sensible for a large piece, it says so and asks for a better photo rather than inventing a spot.
+- Results vary with the room; products are tested before anything goes live.
+
+## Contact
+
+- Harsh Garg, hello@gruhalabs.com

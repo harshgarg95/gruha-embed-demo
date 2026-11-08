@@ -3,13 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Gruha — See it in their room. Buy it from your store.</title>
-<meta name="description" content="Your customer photographs their room. Your product appears in it at its real size, lit by their own light, with your price and a link straight to your checkout.">
-<meta name="robots" content="noindex">
+<title>Gruha — See it in your room, for furniture &amp; décor brands</title>
+<meta name="description" content="Shoppers see your product in a photo of their own room, at its real size, with an itemised price in ₹. No 3D models. Works on Shopify and any website.">
+<!-- Discovery pack, 8 Nov: `noindex` removed. It kept this page out of Google and Bing, and
+     ChatGPT search reads Bing's index, so nothing else in this pack could reach anyone with it
+     in place. The demo storefronts keep theirs: they carry other brands' catalogues. -->
+<link rel="canonical" href="https://room.gruhalabs.com/">
+<meta property="og:site_name" content="Gruha">
 <meta property="og:title" content="See it in their room. Buy it from your store.">
 <meta property="og:description" content="One button on your product page. Your customer's phone photo comes back as a priced room.">
 <meta property="og:image" content="https://room.gruhalabs.com/media/walkthrough-poster.jpg">
+<meta property="og:url" content="https://room.gruhalabs.com/">
 <meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="See it in their room. Buy it from your store.">
+<meta name="twitter:description" content="One button on your product page. Your customer's phone photo comes back as a priced room.">
+<meta name="twitter:image" content="https://room.gruhalabs.com/media/walkthrough-poster.jpg">
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,700,800&f[]=general-sans@400,500,600&display=swap">
 <link rel="stylesheet" href="/media/marketing.css">
@@ -108,9 +117,132 @@
   .mkt-video__play[hidden] { display: none !important; }
   @media (max-width: 720px) { .mkt-video__play { width: 72px; height: 72px; } }
 
+  /* Discovery pack, 8 Nov — the FAQ. Built on the problem section's two-column grid and its
+     hairline list (.mkt-friction__item), so it reads as the same page, not an add-on. Plain
+     <details>, no script. The answers are mirrored word for word in the FAQPage JSON-LD at the
+     foot of <head>: Google drops FAQ markup that does not match the visible text, so an edit
+     here must be made there too. */
+  .mkt-faq { border-bottom: 1px solid var(--line); }
+  .mkt-faq__item { border-top: 1px solid var(--line); }
+  .mkt-faq__item > summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between;
+    align-items: baseline; gap: var(--sp-4); padding: var(--sp-5) 0;
+    font-weight: 600; font-size: 17px; line-height: 1.4; color: var(--ink); }
+  .mkt-faq__item > summary::-webkit-details-marker { display: none; }
+  /* a drawn plus, not a glyph: the font's '+' sat small and off the text's centre line */
+  .mkt-faq__item > summary::after { content: ''; flex: 0 0 auto; width: 14px; height: 14px; align-self: center;
+    background: linear-gradient(currentColor, currentColor) center / 14px 1.5px no-repeat,
+                linear-gradient(currentColor, currentColor) center / 1.5px 14px no-repeat;
+    color: var(--muted); transition: transform .2s ease; }
+  .mkt-faq__item[open] > summary::after { transform: rotate(45deg); }
+  .mkt-faq__item > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .mkt-faq__item > p { padding-bottom: var(--sp-5); font-size: 15.5px; line-height: 1.55; color: var(--muted); max-width: 60ch; }
+
   .mkt-limits { border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; background: var(--paper); }
   @media (max-width: 760px) { .mkt-limits { padding: 18px; } }
 </style>
+<script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Gruha",
+    "alternateName": "Gruha See it in your room",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "url": "https://room.gruhalabs.com/",
+    "image": "https://room.gruhalabs.com/media/walkthrough-poster.jpg",
+    "description": "Shoppers see your product in a photo of their own room, at its real size, with an itemised price in ₹. No 3D models. Works on Shopify and any website.",
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Starter",
+        "price": "4999",
+        "priceCurrency": "INR",
+        "description": "Per month, 5,000 credits, about 125 renders. Prices exclude GST.",
+        "url": "https://room.gruhalabs.com/plans/"
+      },
+      {
+        "@type": "Offer",
+        "name": "Growth",
+        "price": "9999",
+        "priceCurrency": "INR",
+        "description": "Per month, 10,000 credits, about 250 renders. Prices exclude GST.",
+        "url": "https://room.gruhalabs.com/plans/"
+      },
+      {
+        "@type": "Offer",
+        "name": "White-label",
+        "price": "17999",
+        "priceCurrency": "INR",
+        "description": "Per month, 10,000 credits, 250 renders, no Gruha badge. Prices exclude GST.",
+        "url": "https://room.gruhalabs.com/plans/"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is a “See it in your room” button?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "One button on your product page. A customer photographs their room, and your product appears in it at its real size, lit by their own light, with your price and a link straight to your checkout."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do I need 3D models?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. It runs on your existing catalogue photos: each render is generated from your catalogue photograph and the shopper’s room photograph."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does it work on Shopify and other websites?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. On Shopify it is an app you switch on from your theme editor. On WooCommerce or any other site it is one script tag."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How long does a render take?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "About a minute, from your customer’s phone photo to a priced room."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What does it cost?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Starter is ₹4,999 per month for 5,000 credits (about 125 renders). Growth is ₹9,999 per month for 10,000 credits (about 250 renders), and White-label is ₹17,999 per month for 10,000 credits with no Gruha badge. One render is 40 credits, a failed render is free, and prices exclude GST; the pricing page has the details."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Will it change my store’s design?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. Nothing in your theme is edited, and it comes off just as easily."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What can’t it do?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "It’s a visualisation, not a photograph. A daylit indoor photo gives a much better result than a dim or outdoor one, and when a room has nowhere sensible for a large piece, it says so and asks for a better photo rather than inventing a spot. More on what it can and can’t do."
+        }
+      }
+    ]
+  }
+]
+</script>
 </head>
 <body class="mkt">
 
@@ -395,6 +527,49 @@
         <div class="mkt-qitem__price">₹4,480</div>
       </div>
       <div class="mkt-qtotal"><span class="lab">Total</span><span class="val">₹48,300</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- Discovery pack, 8 Nov. Every answer restates something this site already says — the hero,
+     How it works, the CTA fine print, /plans/ and /honest-limits/ — and nothing else. No new
+     claims and no outcome numbers. Mirrored exactly in the FAQPage JSON-LD in <head>. -->
+<section id="faq" class="mkt-section mkt-band" aria-labelledby="faq-h">
+  <div class="mkt-wrap mkt-problem__grid">
+    <div class="mkt-problem__intro">
+      <p class="mkt-eyebrow">FAQ</p>
+      <h2 class="mkt-h2" id="faq-h">Questions brands ask first.</h2>
+      <p class="mkt-sectlead">What the button is, what it needs from you, and what it costs.</p>
+    </div>
+    <div class="mkt-faq">
+      <details class="mkt-faq__item" open>
+        <summary>What is a “See it in your room” button?</summary>
+        <p>One button on your product page. A customer photographs their room, and your product appears in it at its real size, lit by their own light, with your price and a link straight to your checkout.</p>
+      </details>
+      <details class="mkt-faq__item">
+        <summary>Do I need 3D models?</summary>
+        <p>No. It runs on your existing catalogue photos: each render is generated from your catalogue photograph and the shopper’s room photograph.</p>
+      </details>
+      <details class="mkt-faq__item">
+        <summary>Does it work on Shopify and other websites?</summary>
+        <p>Yes. On Shopify it is an app you switch on from your theme editor. On WooCommerce or any other site it is one script tag.</p>
+      </details>
+      <details class="mkt-faq__item">
+        <summary>How long does a render take?</summary>
+        <p>About a minute, from your customer’s phone photo to a priced room.</p>
+      </details>
+      <details class="mkt-faq__item">
+        <summary>What does it cost?</summary>
+        <p>Starter is ₹4,999 per month for 5,000 credits (about 125 renders). Growth is ₹9,999 per month for 10,000 credits (about 250 renders), and White-label is ₹17,999 per month for 10,000 credits with no Gruha badge. One render is 40 credits, a failed render is free, and prices exclude GST; the <a href="/plans/">pricing page</a> has the details.</p>
+      </details>
+      <details class="mkt-faq__item">
+        <summary>Will it change my store’s design?</summary>
+        <p>No. Nothing in your theme is edited, and it comes off just as easily.</p>
+      </details>
+      <details class="mkt-faq__item">
+        <summary>What can’t it do?</summary>
+        <p>It’s a visualisation, not a photograph. A daylit indoor photo gives a much better result than a dim or outdoor one, and when a room has nowhere sensible for a large piece, it says so and asks for a better photo rather than inventing a spot. More on <a href="/honest-limits/">what it can and can’t do</a>.</p>
+      </details>
     </div>
   </div>
 </section>
