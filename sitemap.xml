@@ -2,10 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://room.gruhalabs.com/</loc>
-    <lastmod>2026-11-08</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://room.gruhalabs.com/plans/</loc>
-    <lastmod>2026-11-08</lastmod>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://room.gruhalabs.com/honest-limits/</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://room.gruhalabs.com/guides/show-furniture-in-customers-room/</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://room.gruhalabs.com/guides/alternative-to-ar-for-furniture-websites/</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://room.gruhalabs.com/guides/shopify-see-in-your-room-button/</loc>
+    <lastmod>2026-11-14</lastmod>
   </url>
 </urlset>

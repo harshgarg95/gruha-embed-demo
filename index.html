@@ -10,6 +10,9 @@
      ChatGPT search reads Bing's index, so nothing else in this pack could reach anyone with it
      in place. The demo storefronts keep theirs: they carry other brands' catalogues. -->
 <link rel="canonical" href="https://room.gruhalabs.com/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:site_name" content="Gruha">
 <meta property="og:title" content="See it in their room. Buy it from your store.">
 <meta property="og:description" content="One button on your product page. Your customer's phone photo comes back as a priced room.">
@@ -148,6 +151,7 @@
     "@type": "SoftwareApplication",
     "name": "Gruha",
     "alternateName": "Gruha See it in your room",
+    "provider": { "@id": "https://room.gruhalabs.com/#organization" },
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web",
     "url": "https://room.gruhalabs.com/",
@@ -178,6 +182,23 @@
         "description": "Per month, 10,000 credits, 250 renders, no Gruha badge. Prices exclude GST.",
         "url": "https://room.gruhalabs.com/plans/"
       }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "https://room.gruhalabs.com/#organization",
+    "name": "Gruha",
+    "url": "https://room.gruhalabs.com/",
+    "logo": "https://room.gruhalabs.com/media/gruha-logo-512.png",
+    "email": "hello@gruhalabs.com",
+    "address": { "@type": "PostalAddress", "addressLocality": "Hyderabad", "addressCountry": "IN" },
+    "sameAs": [
+      "https://www.instagram.com/gruhalabs/",
+      "https://www.linkedin.com/company/gruha-labs/",
+      "https://www.youtube.com/@GruhaLabs",
+      "https://in.pinterest.com/gruhalabs/",
+      "https://www.facebook.com/profile.php?id=61596527423753"
     ]
   },
   {
@@ -234,6 +255,30 @@
       },
       {
         "@type": "Question",
+        "name": "Does the shopper need to download an app?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. The button sits on your product page and works in the shopper’s mobile browser, with no app and no login."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does it work on WhatsApp for my sales team?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Your sales team can send a finished render and a priced quote back on WhatsApp, instead of a catalogue link. Shoppers can also share their own render on WhatsApp."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What photos do I need to provide?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Your existing product photos, plus each product’s dimensions so it is shown at its real size. No 3D models."
+        }
+      },
+      {
+        "@type": "Question",
         "name": "What can’t it do?",
         "acceptedAnswer": {
           "@type": "Answer",
@@ -263,7 +308,7 @@
              data-retention terms and the contact address. -->
         <a href="/plans/">Pricing</a>
       </div>
-      <a class="mkt-btn mkt-btn--primary" href="/demo/">Try the live demo</a>
+      <a class="mkt-btn mkt-btn--primary" href="/furniture/">Try the live demo</a>
     </div>
   </div>
 </nav>
@@ -278,7 +323,7 @@
         lit by their own light, with your price and a link straight to your checkout.
       </p>
       <div class="mkt-hero__cta">
-        <a class="mkt-btn mkt-btn--primary" href="/demo/">Try the live demo →</a>
+        <a class="mkt-btn mkt-btn--primary" href="/furniture/">Try the live demo →</a>
       </div>
       <p class="mkt-hero__note">
         <span class="mkt-dot" aria-hidden="true"></span>
@@ -295,10 +340,10 @@
       <div class="stage3" id="stage">
         <div class="stage3__frame">
           <picture class="stage3__pic" data-stage="0" style="opacity:1">
-            <img class="stage3__img" src="/media/renders/hero_before.jpg" alt="A customer's own bedroom, photographed on a phone" decoding="async">
+            <img width="1400" height="788" fetchpriority="high" class="stage3__img" src="/media/renders/hero_before.jpg" alt="A customer's own bedroom, photographed on a phone" decoding="async">
           </picture>
           <picture class="stage3__pic" data-stage="1" style="opacity:0">
-            <img class="stage3__img" src="/media/renders/hero_after.jpg" alt="The same bedroom with a floor mirror from the catalogue standing against the right wall at its real size" loading="lazy" decoding="async" aria-hidden="true">
+            <img width="1376" height="768" class="stage3__img" src="/media/renders/hero_after.jpg" alt="The same bedroom with a floor mirror from the catalogue standing against the right wall at its real size" loading="lazy" decoding="async" aria-hidden="true">
           </picture>
           <span class="stage3__badge"><span class="stage3__badge-n">1</span><span id="stageLabel">Their room</span></span>
           <div class="stage3__quote" id="stageQuote" aria-hidden="true" hidden>
@@ -354,20 +399,20 @@
 <section id="why" class="mkt-section">
   <div class="mkt-wrap">
     <div class="mkt-sect-head mkt-sect-head--center">
-      <p class="mkt-eyebrow">Why brands use Gruha</p>
-      <h2 class="mkt-h2">Turn &ldquo;I&rsquo;ll think about it&rdquo; into orders.</h2>
+      <p class="mkt-eyebrow">What the shopper gets</p>
+      <h2 class="mkt-h2">Their own room, on your product page.</h2>
       <p class="mkt-sectlead">
-        The traffic is already on your product page. This gives the undecided ones the one thing
-        a product shot cannot: their own room, with your piece in it.
+        The shopper is already on your product page. This shows them the one thing a product
+        shot cannot: their own room, with your piece in it.
       </p>
     </div>
     <!-- AL A: this was a 2x2 with three cards and an empty grey cell, which reads as broken.
          The fourth is modelled on the Studio's "A closing tool for sales & designers". -->
     <div class="mkt-outcomes">
-      <article class="mkt-outcome"><div class="mkt-outcome__ic">↗</div><h3>More orders from the same traffic</h3><p>The doubt that stops the order is answered on the page, not after a support email. No extra ad spend.</p></article>
-      <article class="mkt-outcome"><div class="mkt-outcome__ic">↺</div><h3>Fewer returns</h3><p>They have already seen the real size in their real room before they pay.</p></article>
-      <article class="mkt-outcome"><div class="mkt-outcome__ic">₹</div><h3>Bigger baskets</h3><p>A staged room is a room with more than one thing in it — and they are all priced together.</p></article>
-      <article class="mkt-outcome"><div class="mkt-outcome__ic">◱</div><h3>A closing tool for your team</h3><p>Sales and WhatsApp enquiries get a finished render and a priced quote to send back, instead of a catalogue link.</p></article>
+      <article class="mkt-outcome"><div class="mkt-outcome__ic">↗</div><h3>Answers &ldquo;will it fit?&rdquo; on the product page</h3><p>The shopper sees the piece in a photo of their own room, right on your product page, without writing to support first.</p></article>
+      <article class="mkt-outcome"><div class="mkt-outcome__ic">↔</div><h3>Shows real size before they pay</h3><p>The piece appears at its real size in their own room, before they reach checkout.</p></article>
+      <article class="mkt-outcome"><div class="mkt-outcome__ic">₹</div><h3>Prices the whole room together</h3><p>Several pieces can be placed in one room, and each one is itemised in ₹ on a single quote.</p></article>
+      <article class="mkt-outcome"><div class="mkt-outcome__ic">◱</div><h3>A render your team can send</h3><p>Sales and WhatsApp enquiries get a finished render and a priced quote to send back, instead of a catalogue link.</p></article>
     </div>
   </div>
 </section>
@@ -384,25 +429,25 @@
     <div class="mkt-how__grid">
       <article class="mkt-step">
         <div class="mkt-step__num">01</div>
-        <div class="mkt-step__media"><img src="/media/steps/step1_button.jpg" alt="A product page with a “See it in your room” button beneath Add to cart" loading="lazy" decoding="async"></div>
+        <div class="mkt-step__media"><img width="800" height="600" src="/media/steps/step1_button.jpg" alt="A product page with a “See it in your room” button beneath Add to cart" loading="lazy" decoding="async"></div>
         <h3>One button on your product page</h3>
         <p>Switched on from your theme editor. Nothing in your theme gets edited.</p>
       </article>
       <article class="mkt-step">
         <div class="mkt-step__num">02</div>
-        <div class="mkt-step__media"><img src="/media/steps/step2_photo.jpg" alt="A hallway photographed by the customer, before anything is added" loading="lazy" decoding="async"></div>
+        <div class="mkt-step__media"><img width="800" height="600" src="/media/steps/step2_photo.jpg" alt="A hallway photographed by the customer, before anything is added" loading="lazy" decoding="async"></div>
         <h3>Your customer uploads a photo</h3>
         <p>Of the room they&rsquo;re buying for — bare or already lived-in.</p>
       </article>
       <article class="mkt-step">
         <div class="mkt-step__num">03</div>
-        <div class="mkt-step__media"><img src="/media/steps/step3_render.jpg" alt="The same hallway with the console rendered into it at its real size" loading="lazy" decoding="async"></div>
+        <div class="mkt-step__media"><img width="800" height="600" src="/media/steps/step3_render.jpg" alt="The same hallway with the console rendered into it at its real size" loading="lazy" decoding="async"></div>
         <h3>Your product appears in it</h3>
         <p>At its real size, lit by the light already in that room.</p>
       </article>
       <article class="mkt-step">
         <div class="mkt-step__num">04</div>
-        <div class="mkt-step__media"><img src="/media/steps/step4_quote.jpg" alt="The itemised quote: one line, a total in rupees, and Buy now" loading="lazy" decoding="async"></div>
+        <div class="mkt-step__media"><img width="800" height="600" src="/media/steps/step4_quote.jpg" alt="The itemised quote: one line, a total in rupees, and Buy now" loading="lazy" decoding="async"></div>
         <h3>An itemised quote in ₹</h3>
         <p>With a link straight to your product page.</p>
       </article>
@@ -430,26 +475,26 @@
          the frame edge. -->
     <div class="mkt-gallery__grid">
       <figure class="mkt-gcard" role="button" tabindex="0" data-g="bowl" aria-label="Enlarge: On a surface · bowl on a coffee table">
-        <img src="/media/renders/g_bowl_after.jpg" alt="A living room with a blue chinoiserie fruit bowl placed on the marble coffee table" loading="lazy" decoding="async">
-        <img class="mkt-gcard__before" src="/media/renders/g_bowl_before.jpg" alt="The same living room before, without the bowl" loading="lazy" decoding="async">
+        <img width="1100" height="614" src="/media/renders/g_bowl_after.jpg" alt="A living room with a blue chinoiserie fruit bowl placed on the marble coffee table" loading="lazy" decoding="async">
+        <img width="1100" height="614" class="mkt-gcard__before" src="/media/renders/g_bowl_before.jpg" alt="The same living room before, without the bowl" loading="lazy" decoding="async">
         <span class="mkt-gcard__zoom" aria-hidden="true">⤢</span>
         <figcaption class="mkt-gcard__label">On a surface · bowl on a coffee table</figcaption>
       </figure>
       <figure class="mkt-gcard" role="button" tabindex="0" data-g="mirror" aria-label="Enlarge: Against a wall · floor mirror">
-        <img src="/media/renders/g_mirror_after.jpg" alt="A bedroom with a tall distressed floor mirror leaning against the right wall" loading="lazy" decoding="async">
-        <img class="mkt-gcard__before" src="/media/renders/g_mirror_before.jpg" alt="The same bedroom before, without the mirror" loading="lazy" decoding="async">
+        <img width="1100" height="614" src="/media/renders/g_mirror_after.jpg" alt="A bedroom with a tall distressed floor mirror leaning against the right wall" loading="lazy" decoding="async">
+        <img width="1100" height="619" class="mkt-gcard__before" src="/media/renders/g_mirror_before.jpg" alt="The same bedroom before, without the mirror" loading="lazy" decoding="async">
         <span class="mkt-gcard__zoom" aria-hidden="true">⤢</span>
         <figcaption class="mkt-gcard__label">Against a wall · floor mirror</figcaption>
       </figure>
       <figure class="mkt-gcard" role="button" tabindex="0" data-g="table" aria-label="Enlarge: In place of something · side table swap">
-        <img src="/media/renders/g_table_after.jpg" alt="A bedroom where the bedside table has been swapped for an ornamental blue-and-white pedestal side table" loading="lazy" decoding="async">
-        <img class="mkt-gcard__before" src="/media/renders/g_table_before.jpg" alt="The same bedroom before, with the original bedside table" loading="lazy" decoding="async">
+        <img width="1100" height="614" src="/media/renders/g_table_after.jpg" alt="A bedroom where the bedside table has been swapped for an ornamental blue-and-white pedestal side table" loading="lazy" decoding="async">
+        <img width="1100" height="619" class="mkt-gcard__before" src="/media/renders/g_table_before.jpg" alt="The same bedroom before, with the original bedside table" loading="lazy" decoding="async">
         <span class="mkt-gcard__zoom" aria-hidden="true">⤢</span>
         <figcaption class="mkt-gcard__label">In place of something · side table swap</figcaption>
       </figure>
       <figure class="mkt-gcard" role="button" tabindex="0" data-g="console" aria-label="Enlarge: At its real size · entryway console">
-        <img src="/media/renders/g_console_after.jpg" alt="An entryway where the dark wooden console has been swapped for a white carved console, rendered about 108 cm wide against a stated 106 cm — narrower than the piece it replaced, with floor and wall visible at its right end" loading="lazy" decoding="async">
-        <img class="mkt-gcard__before" src="/media/renders/g_console_before.jpg" alt="The same entryway before, with the original dark wooden console" loading="lazy" decoding="async">
+        <img width="1100" height="614" src="/media/renders/g_console_after.jpg" alt="An entryway where the dark wooden console has been swapped for a white carved console, rendered about 108 cm wide against a stated 106 cm — narrower than the piece it replaced, with floor and wall visible at its right end" loading="lazy" decoding="async">
+        <img width="1100" height="614" class="mkt-gcard__before" src="/media/renders/g_console_before.jpg" alt="The same entryway before, with the original dark wooden console" loading="lazy" decoding="async">
         <span class="mkt-gcard__zoom" aria-hidden="true">⤢</span>
         <figcaption class="mkt-gcard__label">At its real size · entryway console</figcaption>
       </figure>
@@ -462,8 +507,8 @@
            each crop against the product it was assumed to be (see spots.ts in the walkthrough
            project); at full frame they are 1.45%, 1.35%, 1.01% and 0.30% of the picture. -->
       <figure class="mkt-gcard mkt-gcard--wide" role="button" tabindex="0" data-g="look" aria-label="Enlarge: Four pieces at once · one bedroom">
-        <img src="/media/renders/g_look_after.jpg" alt="A bedroom with four décor pieces added in one render: a jute round mirror on the wall, a chevron planter by the window, a woven basket at the foot of the bed and tealight holders on the nightstand" loading="lazy" decoding="async">
-        <img class="mkt-gcard__before" src="/media/renders/g_look_before.jpg" alt="The same bedroom before, without any of the four pieces" loading="lazy" decoding="async">
+        <img width="1600" height="893" src="/media/renders/g_look_after.jpg" alt="A bedroom with four décor pieces added in one render: a jute round mirror on the wall, a chevron planter by the window, a woven basket at the foot of the bed and tealight holders on the nightstand" loading="lazy" decoding="async">
+        <img width="1600" height="900" class="mkt-gcard__before" src="/media/renders/g_look_before.jpg" alt="The same bedroom before, without any of the four pieces" loading="lazy" decoding="async">
         <span class="mkt-gcard__zoom" aria-hidden="true">⤢</span>
         <figcaption class="mkt-gcard__label">Four pieces at once · one bedroom</figcaption>
       </figure>
@@ -568,6 +613,18 @@
         <p>No. Nothing in your theme is edited, and it comes off just as easily.</p>
       </details>
       <details class="mkt-faq__item">
+        <summary>Does the shopper need to download an app?</summary>
+        <p>No. The button sits on your product page and works in the shopper’s mobile browser, with no app and no login.</p>
+      </details>
+      <details class="mkt-faq__item">
+        <summary>Does it work on WhatsApp for my sales team?</summary>
+        <p>Yes. Your sales team can send a finished render and a priced quote back on WhatsApp, instead of a catalogue link. Shoppers can also share their own render on WhatsApp.</p>
+      </details>
+      <details class="mkt-faq__item">
+        <summary>What photos do I need to provide?</summary>
+        <p>Your existing product photos, plus each product’s dimensions so it is shown at its real size. No 3D models.</p>
+      </details>
+      <details class="mkt-faq__item">
         <summary>What can’t it do?</summary>
         <p>It’s a visualisation, not a photograph. A daylit indoor photo gives a much better result than a dim or outdoor one, and when a room has nowhere sensible for a large piece, it says so and asks for a better photo rather than inventing a spot. More on <a href="/honest-limits/">what it can and can’t do</a>.</p>
       </details>
@@ -579,7 +636,7 @@
   <div class="mkt-wrap">
     <h2>Try it on your own room.</h2>
     <p>Pick any piece, upload a photo of a room you know, and judge the result yourself.</p>
-    <div><a class="mkt-btn mkt-btn--primary" href="/demo/">Try the live demo →</a></div>
+    <div><a class="mkt-btn mkt-btn--primary" href="/furniture/">Try the live demo →</a></div>
     <!-- The page used to end here. Someone who was already convinced had no next step and no
          address to write to — the only exit was the demo they had just been offered. -->
     <p class="mkt-cta__fine">Want it on your store? <a href="/plans/">Pricing and how we start</a> — or write to <a href="mailto:hello@gruhalabs.com">hello@gruhalabs.com</a>. Works on Shopify, WooCommerce or any site; it is one script tag and nothing in your theme is edited.</p>
@@ -598,10 +655,14 @@
       <a href="#problem">Why it matters</a>
       <a href="#how">How it works</a>
       <a href="#gallery">Gallery</a>
+      <a href="/plans/">Pricing</a>
+      <a href="/privacy.html">Privacy</a>
     </div>
   </div>
   <div class="mkt-wrap" style="margin-top:22px">
-    <p class="mkt-footer__meta">© 2026 Gruha · <a href="/honest-limits/">What it can and can’t do</a></p>
+    <p class="mkt-footer__meta">Guides · <a href="/guides/show-furniture-in-customers-room/">Showing furniture in a customer&rsquo;s room</a> · <a href="/guides/alternative-to-ar-for-furniture-websites/">An alternative to AR</a> · <a href="/guides/shopify-see-in-your-room-button/">A button for Shopify stores</a> · <a href="/honest-limits/">What it can and can&rsquo;t do</a></p>
+    <p class="mkt-footer__meta" style="margin-top:10px">Follow Gruha · <a href="https://www.instagram.com/gruhalabs/" rel="me noopener">Instagram</a> · <a href="https://www.linkedin.com/company/gruha-labs/" rel="me noopener">LinkedIn</a> · <a href="https://www.youtube.com/@GruhaLabs" rel="me noopener">YouTube</a> · <a href="https://in.pinterest.com/gruhalabs/" rel="me noopener">Pinterest</a> · <a href="https://www.facebook.com/profile.php?id=61596527423753" rel="me noopener">Facebook</a></p>
+    <p class="mkt-footer__meta" style="margin-top:10px">© 2026 Gruha · Hyderabad · <a href="mailto:hello@gruhalabs.com">hello@gruhalabs.com</a></p>
   </div>
 </footer>
 

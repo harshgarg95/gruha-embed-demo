@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A 'See it in your room' button for Shopify furniture stores | Gruha</title>
+<meta name="description" content="How Gruha adds a See it in your room button to a Shopify furniture or décor store in India: switched on from the theme editor, nothing in the theme edited, an itemised ₹ quote with a buy link.">
+<link rel="canonical" href="https://room.gruhalabs.com/guides/shopify-see-in-your-room-button/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:site_name" content="Gruha">
+<meta property="og:title" content="A &amp;ldquo;See it in your room&amp;rdquo; button for Shopify furniture stores">
+<meta property="og:description" content="How Gruha adds a See it in your room button to a Shopify furniture or décor store in India: switched on from the theme editor, nothing in the theme edited, an itemised ₹ quote with a buy link.">
+<meta property="og:image" content="https://room.gruhalabs.com/media/walkthrough-poster.jpg">
+<meta property="og:url" content="https://room.gruhalabs.com/guides/shopify-see-in-your-room-button/">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,700,800&f[]=general-sans@400,500,600&display=swap">
+<link rel="stylesheet" href="/media/marketing.css">
+<style>
+  html, body { margin: 0; padding: 0; }
+  .g-page { padding-block: clamp(40px, 6vw, 72px) var(--section-y); }
+  .g-page .mkt-wrap { max-width: 820px; }
+  .g-h1 { font-size: clamp(34px, 5vw, 52px); line-height: 1.06; letter-spacing: -0.028em; font-weight: 500; margin: var(--sp-4) 0 0; max-width: 20ch; }
+  .g-updated { margin-top: var(--sp-4); font-size: 13.5px; color: var(--muted); }
+  .g-def { margin-top: var(--sp-5); font-size: clamp(18px, 1.8vw, 21px); line-height: 1.5; letter-spacing: -0.01em; color: var(--ink-2); max-width: 60ch; }
+  .g-short { margin-top: var(--sp-6); border: 1px solid var(--line); border-radius: 14px; padding: 20px 24px; background: var(--sand); }
+  .g-short h2 { font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; color: var(--muted); margin: 0 0 var(--sp-3); font-family: 'General Sans', sans-serif; }
+  .g-short ul { margin: 0; padding-left: 20px; }
+  .g-short li { font-size: 16px; line-height: 1.55; color: var(--ink-2); margin: 4px 0; }
+  .g-body h2 { font-size: clamp(24px, 2.8vw, 30px); line-height: 1.15; letter-spacing: -0.02em; font-weight: 500; margin: var(--sp-8) 0 var(--sp-4); }
+  .g-body h3 { font-size: 19px; font-weight: 600; margin: var(--sp-6) 0 var(--sp-2); }
+  .g-body p, .g-body li { font-size: 17px; line-height: 1.6; color: var(--ink-2); max-width: 66ch; }
+  .g-body p { margin: 0 0 var(--sp-4); }
+  .g-body ol, .g-body ul { padding-left: 22px; margin: 0 0 var(--sp-4); }
+  .g-body li { margin: 6px 0; }
+  .g-table-wrap { overflow-x: auto; margin: var(--sp-4) 0 var(--sp-5); border: 1px solid var(--line); border-radius: 12px; }
+  .g-table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 15px; line-height: 1.45; }
+  .g-table th, .g-table td { text-align: left; vertical-align: top; padding: 12px 14px; border-bottom: 1px solid var(--line); color: var(--ink-2); }
+  .g-table thead th { background: var(--sand); font-weight: 600; color: var(--ink); font-size: 13.5px; letter-spacing: 0.02em; }
+  .g-table tbody th { font-weight: 600; color: var(--ink); }
+  .g-table tr:last-child td, .g-table tr:last-child th { border-bottom: 0; }
+  .g-faq { margin-top: var(--sp-4); border-bottom: 1px solid var(--line); }
+  .g-faq details { border-top: 1px solid var(--line); }
+  .g-faq summary { list-style: none; cursor: pointer; padding: var(--sp-4) 0; font-weight: 600; font-size: 17px; color: var(--ink); }
+  .g-faq summary::-webkit-details-marker { display: none; }
+  .g-faq details > p { padding-bottom: var(--sp-4); color: var(--muted); }
+  .g-cta { margin-top: var(--sp-8); display: flex; flex-wrap: wrap; gap: var(--sp-3); }
+  .mkt p a:not([class]), .mkt li a:not([class]) { color: inherit; text-decoration: underline; text-underline-offset: 3px;
+    text-decoration-color: color-mix(in srgb, currentColor 42%, transparent); }
+  .mkt p a:not([class]):hover, .mkt li a:not([class]):hover { text-decoration-color: currentColor; }
+  @media (max-width: 620px) { .mkt-nav__linkset { display: none; } }
+</style>
+<script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "A &ldquo;See it in your room&rdquo; button for Shopify furniture stores",
+    "description": "How Gruha adds a See it in your room button to a Shopify furniture or décor store in India: switched on from the theme editor, nothing in the theme edited, an itemised ₹ quote with a buy link.",
+    "url": "https://room.gruhalabs.com/guides/shopify-see-in-your-room-button/",
+    "mainEntityOfPage": "https://room.gruhalabs.com/guides/shopify-see-in-your-room-button/",
+    "inLanguage": "en-IN",
+    "datePublished": "2026-11-14",
+    "dateModified": "2026-11-14",
+    "image": "https://room.gruhalabs.com/media/walkthrough-poster.jpg",
+    "author": {
+      "@id": "https://room.gruhalabs.com/#organization"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "@id": "https://room.gruhalabs.com/#organization",
+      "name": "Gruha",
+      "url": "https://room.gruhalabs.com/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://room.gruhalabs.com/media/gruha-logo-512.png"
+      }
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://room.gruhalabs.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "A button for Shopify stores",
+        "item": "https://room.gruhalabs.com/guides/shopify-see-in-your-room-button/"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Will it change my store’s design?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. Nothing in your theme is edited, and it comes off just as easily."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does it work on Shopify and other websites?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. On Shopify it is an app you switch on from your theme editor. On WooCommerce or any other site it is one script tag."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does it work on WhatsApp for my sales team?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Your sales team can send a finished render and a priced quote back on WhatsApp, instead of a catalogue link. Shoppers can also share their own render on WhatsApp."
+        }
+      }
+    ]
+  }
+]
+</script>
+</head>
+<body class="mkt">
+<nav class="mkt-nav">
+  <div class="mkt-wrap mkt-nav__row">
+    <a class="mkt-brand" href="/"><span class="mkt-brand__mark">G</span><span class="mkt-brand__name">Gruha</span></a>
+    <div class="mkt-nav__links">
+      <div class="mkt-nav__linkset"><a href="/#how">How it works</a><a href="/plans/">Pricing</a></div>
+      <a class="mkt-btn mkt-btn--primary" href="/furniture/">Try the live demo</a>
+    </div>
+  </div>
+</nav>
+<main class="g-page">
+  <article class="mkt-wrap">
+    <p class="mkt-eyebrow">Guide</p>
+    <h1 class="g-h1">A &ldquo;See it in your room&rdquo; button for Shopify furniture stores</h1>
+    <p class="g-updated">Last updated 14 November 2026</p>
+    <p class="g-def">A &ldquo;See it in your room&rdquo; button lets a shopper on your Shopify product page upload a photo of their own room and see your product in it, at its real size. Gruha is that button for furniture and décor brands, with an itemised quote in ₹.</p>
+    <div class="g-short">
+      <h2>In short</h2>
+      <ul>
+        <li>On Shopify, Gruha is an app switched on from your theme editor.</li>
+        <li>Nothing in your theme is edited, and it comes off just as easily.</li>
+        <li>The shopper gets a render of their own room and an itemised ₹ quote with a buy link to your existing product page.</li>
+        <li>On WooCommerce or any other site, it is one script tag.</li>
+      </ul>
+    </div>
+    <div class="g-body">
+    <h2>How it works on a Shopify product page</h2>
+    <ol>
+      <li><b>One button on your product page.</b> It is switched on from your theme editor, and nothing in your theme is edited.</li>
+      <li><b>The shopper uploads a photo</b> of the room they are buying for, bare or already lived-in, from the phone camera or gallery.</li>
+      <li><b>Your product appears in it</b> at its real size, lit by the light already in that room. It takes about a minute.</li>
+      <li><b>An itemised quote in ₹,</b> with a buy link straight to your product page.</li>
+    </ol>
+
+    <h2>How we start</h2>
+    <ol>
+      <li><b>We set up your catalogue</b> and test the renders on real rooms before anything goes live.</li>
+      <li><b>You try it yourself</b> on your own living room, and tell us what you think.</li>
+      <li><b>We switch it on</b> in your theme editor. Nothing in your theme is edited, and it comes off just as easily.</li>
+    </ol>
+
+    <h2>What is included</h2>
+    <div class="g-table-wrap">
+      <table class="g-table">
+        <thead><tr><th scope="col">For the shopper</th><th scope="col">For your team</th></tr></thead>
+        <tbody>
+          <tr><td>Phone camera capture, or a QR code from desktop to phone</td><td>A live usage dashboard</td></tr>
+          <tr><td>A photo guide before upload</td><td>The most-visualised products</td></tr>
+          <tr><td>Several products in one room, with colour and fabric variants</td><td>CSV export</td></tr>
+          <tr><td>An itemised price in ₹ and Buy now from the render</td><td>Renders kept 90 days, yours to reuse in your marketing</td></tr>
+          <tr><td>Share on WhatsApp, or download the render</td><td>Abuse limits, so one visitor can&rsquo;t drain your credits</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Not on Shopify?</h2>
+    <p>On WooCommerce or any other website, Gruha is one script tag, and nothing in your theme is edited.</p>
+    <p>Plans and credits are on the <a href="/plans/">pricing page</a>. It is a visualisation, not a photograph; see <a href="/honest-limits/">what it can and can&rsquo;t do</a>.</p>
+    <h2>Questions</h2>
+    <div class="g-faq">
+      <details>
+        <summary>Will it change my store’s design?</summary>
+        <p>No. Nothing in your theme is edited, and it comes off just as easily.</p>
+      </details>
+      <details>
+        <summary>Does it work on Shopify and other websites?</summary>
+        <p>Yes. On Shopify it is an app you switch on from your theme editor. On WooCommerce or any other site it is one script tag.</p>
+      </details>
+      <details>
+        <summary>Does it work on WhatsApp for my sales team?</summary>
+        <p>Yes. Your sales team can send a finished render and a priced quote back on WhatsApp, instead of a catalogue link. Shoppers can also share their own render on WhatsApp.</p>
+      </details>
+    </div>
+    </div>
+    <div class="g-cta">
+      <a class="mkt-btn mkt-btn--primary" href="/furniture/">Try the live demo →</a>
+      <a class="mkt-btn mkt-btn--ghost" href="/plans/">Pricing and how we start</a>
+    </div>
+  </article>
+</main>
+<footer class="mkt-footer">
+  <div class="mkt-wrap mkt-footer__row">
+    <div>
+      <a class="mkt-brand" href="/"><span class="mkt-brand__mark">G</span><span class="mkt-brand__name">Gruha</span></a>
+      <p class="mkt-footer__meta" style="margin-top:12px">&ldquo;See it in your room&rdquo; for furniture &amp; décor brands · Made in India</p>
+    </div>
+    <div class="mkt-footer__links">
+      <a href="/">Home</a>
+      <a href="/plans/">Pricing</a>
+      <a href="/honest-limits/">What it can and can&rsquo;t do</a>
+      <a href="/privacy.html">Privacy</a>
+    </div>
+  </div>
+  <div class="mkt-wrap" style="margin-top:22px">
+    <p class="mkt-footer__meta">Guides · <a href="/guides/show-furniture-in-customers-room/">Showing furniture in a customer&rsquo;s room</a> · <a href="/guides/alternative-to-ar-for-furniture-websites/">An alternative to AR</a> · <a href="/guides/shopify-see-in-your-room-button/">A button for Shopify stores</a></p>
+    <p class="mkt-footer__meta" style="margin-top:10px">Follow Gruha · <a href="https://www.instagram.com/gruhalabs/" rel="me noopener">Instagram</a> · <a href="https://www.linkedin.com/company/gruha-labs/" rel="me noopener">LinkedIn</a> · <a href="https://www.youtube.com/@GruhaLabs" rel="me noopener">YouTube</a> · <a href="https://in.pinterest.com/gruhalabs/" rel="me noopener">Pinterest</a> · <a href="https://www.facebook.com/profile.php?id=61596527423753" rel="me noopener">Facebook</a></p>
+    <p class="mkt-footer__meta" style="margin-top:10px">&copy; 2026 Gruha · Hyderabad · <a href="mailto:hello@gruhalabs.com">hello@gruhalabs.com</a></p>
+  </div>
+</footer>
+</body>
+</html>

@@ -29,8 +29,12 @@ Several products can be placed in one room, with colour and fabric variants. Sho
 
 - [Home](https://room.gruhalabs.com/): what it does, how it works, real renders and the walkthrough video
 - [Pricing and how we start](https://room.gruhalabs.com/plans/): plans, credits, onboarding steps and data retention
-- [What it can and can't do](https://room.gruhalabs.com/honest-limits/): the honest limits
-- [Live demo](https://room.gruhalabs.com/demo/): a demo storefront on a real Indian décor catalogue; no login
+- [What it can and can't do](https://room.gruhalabs.com/honest-limits/): the honest limits, what makes a good room photo, and how real size is kept
+- [How to show furniture in a customer's own room](https://room.gruhalabs.com/guides/show-furniture-in-customers-room/): lifestyle photos, 3D/AR viewers and photo-based room renders compared
+- [An alternative to AR for furniture websites in India](https://room.gruhalabs.com/guides/alternative-to-ar-for-furniture-websites/): what AR needs, what a photo-based render needs instead, and the trade-offs
+- [A "See it in your room" button for Shopify furniture stores](https://room.gruhalabs.com/guides/shopify-see-in-your-room-button/): switched on from the theme editor; one script tag on other sites
+
+A live demo is linked from the homepage.
 
 ## Honest limits
 
@@ -38,6 +42,14 @@ Several products can be placed in one room, with colour and fabric variants. Sho
 - A daylit indoor photo gives a much better result than a dim or outdoor one.
 - When a room has nowhere sensible for a large piece, it says so and asks for a better photo rather than inventing a spot.
 - Results vary with the room; products are tested before anything goes live.
+
+## Profiles
+
+- Instagram: https://www.instagram.com/gruhalabs/
+- LinkedIn: https://www.linkedin.com/company/gruha-labs/
+- YouTube: https://www.youtube.com/@GruhaLabs
+- Pinterest: https://in.pinterest.com/gruhalabs/
+- Facebook: https://www.facebook.com/profile.php?id=61596527423753
 
 ## Contact
 
