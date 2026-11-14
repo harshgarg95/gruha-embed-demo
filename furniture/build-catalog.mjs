@@ -1,12 +1,8 @@
 // Build products.json for the SEATING demo at room.gruhalabs.com/furniture.
 //
-// Why this page exists at all: large upholstered seating is the strongest thing this product does
-// -- a sofa is the hardest thing to judge from a white background -- and The Décor Kart sell none.
-// Their catalogue is 2,333 products with zero sofas, zero armchairs, zero beds and nothing
-// upholstered beyond ₹570 cushion covers; the only "settee" in it is a porcelain figurine lamp.
-// So the seating demo cannot be built from their catalogue, and putting a rival brand's sofa on a
-// page headed THE DÉCOR KART -- with a Buy link to that rival -- would be worse than not having
-// one. It gets its own storefront instead, honestly branded, on the same domain.
+// Why this page exists: large upholstered seating is the strongest thing this product does
+// -- a sofa is the hardest thing to judge from a white background -- so it gets its own
+// storefront, honestly branded, on the same domain.
 //
 // Orange Tree (orangetree.in) is a real Indian furniture brand with a public Shopify catalogue.
 //
