@@ -77,11 +77,11 @@
   // the server stores it hashed. Clearing it is possible, which is why an IP cap backs it up.
   // 16 Nov 2026: funnel beacon — counts button opens and photo picks (no image is sent, nothing is
   // charged). Fire-and-forget; a failure here must never affect the shopper.
-  function track (ev) {
+  function track (ev, prodName) {
     try {
       fetch(cfg.endpoint + '?track=1', { method: 'POST', keepalive: true,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: cfg.key, event: ev, device: deviceId(), product: product && product.name,
+        body: JSON.stringify({ key: cfg.key, event: ev, device: deviceId(), product: prodName || (product && product.name),
                                page: location.pathname }) }).catch(function () {})
     } catch (e) { /* never break the widget */ }
   }
@@ -1108,7 +1108,7 @@
       var rows = items.map(function (it) {
         sum += Number(it.price_inr) || 0
         var buy = it.buy_link
-          ? '<a class="l-buy" href="' + it.buy_link + '" target="_blank" rel="noopener">Buy ↗</a>' : ''
+          ? '<a class="l-buy" data-name="' + String(it.name).replace(/"/g, '&quot;') + '" href="' + it.buy_link + '" target="_blank" rel="noopener">Buy ↗</a>' : ''
         return '<div class="g-row"><span>' + it.name + ' × 1' + buy + '</span><span>' +
           money(it.price_inr) + '</span></div>'
       }).join('')
@@ -1116,12 +1116,17 @@
         rows += '<div class="g-row"><span style="color:#8a6d1f">Showing your top ' + items.length +
           ' of ' + total + '</span><span></span></div>'
       }
+      L('.l-quote').onclick = function (e) {
+        var a = e.target && e.target.closest && e.target.closest('.l-buy')
+        if (a) track('buy', a.getAttribute('data-name'))
+      }
       L('.l-quote').innerHTML = rows + '<div class="g-tot"><span>Total</span><span>' + money(sum) + '</span></div>'
       lshow('res')
     }
 
     L('.l-wa').addEventListener('click', function () {
       var items = lookGet().slice(0, cap())
+      track('share', 'Look: ' + items.map(function (i) { return i.name }).join(', ').slice(0, 140))
       var msg = 'My look: ' + items.map(function (i) { return i.name }).join(', ')
       function fb () { window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank') }
       try {
@@ -1137,8 +1142,12 @@
     refresh(); renderSaved()
   }
 
+  // 17 Nov: Level 1 proof report — count taps on the brand's Buy button from a result.
+  $('.g-buy').addEventListener('click', function () { track('buy') })
+
   // WhatsApp: share the actual render image where the browser supports it (mobile), else a text link.
   $('.g-wa').addEventListener('click', function () {
+    track('share')
     var msg = 'Check out the ' + product.name + ' in my room — ' + money(product.price_inr) + (product.buy_link ? ('  ' + product.buy_link) : '')
     function fallback() { window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank') }
     try {

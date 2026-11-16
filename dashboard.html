@@ -43,6 +43,13 @@
   .btn{display:inline-block;background:var(--ink);color:#fff;text-decoration:none;font-weight:700;font-size:13px;padding:9px 15px;border-radius:9px}
   .err{background:#fdeceb;color:var(--bad);padding:14px 16px;border-radius:12px;font-size:14px}
   .muted{color:var(--muted);font-size:13px}
+  .fun{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+  @media(max-width:760px){.fun{grid-template-columns:repeat(2,1fr)}}
+  .fun .card .v{font-size:22px}
+  table.ft{width:100%;border-collapse:collapse;font-size:13px}
+  table.ft th{text-align:right;color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.05em;padding:6px 8px;border-bottom:1px solid var(--line)}
+  table.ft th:first-child,table.ft td:first-child{text-align:left}
+  table.ft td{text-align:right;padding:7px 8px;border-bottom:1px solid var(--line)}
 </style></head><body><div class="wrap" id="app">
   <p class="muted">Loading…</p>
 </div>
@@ -53,6 +60,24 @@
   var app = document.getElementById('app')
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
     return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] }) }
+  // 17 Nov 2026 — proof report: opened -> chose a photo -> saw it in their room -> tapped Buy.
+  function funnelHtml (f) {
+    if (!f) return ''
+    var c = function (k, v, sub) { return '<div class="card"><div class="k">' + k + '</div><div class="v">' + v +
+      (sub ? ' <small>' + sub + '</small>' : '') + '</div></div>' }
+    var rows = (f.by_product || []).map(function (p) {
+      return '<tr><td>' + esc(p.name) + '</td><td>' + p.opened + '</td><td>' + p.photos + '</td><td>' + p.rendered +
+        '</td><td><b>' + p.buy_clicks + '</b></td><td>' + p.shares + '</td></tr>' }).join('')
+    return '<h2>Shopper journey this period</h2><div class="fun">' +
+      c('Opened the button', f.opened, f.unique_shoppers ? '· ' + f.unique_shoppers + ' shoppers' : '') +
+      c('Chose a photo', f.chose_photo, f.photo_rate_pct != null ? f.photo_rate_pct + '%' : '') +
+      c('Saw it in their room', f.saw_in_room) +
+      c('Tapped Buy', f.buy_clicks, f.buy_rate_pct != null ? f.buy_rate_pct + '% of renders' : '') +
+      c('Shared on WhatsApp', f.shares) + '</div>' +
+      (rows ? '<div class="panel" style="margin-top:12px;overflow-x:auto"><table class="ft"><tr><th>Product</th><th>Opened</th>' +
+        '<th>Photo</th><th>Saw it</th><th>Buy taps</th><th>Shared</th></tr>' + rows + '</table></div>' : '') +
+      '<p class="muted" style="margin-top:8px">' + esc(f.note || '') + ' Opens and photos are counted from 16 Nov 2026.</p>'
+  }
   if (!token) { app.innerHTML = '<div class="err">This link is missing its token.</div>'; return }
 
   fetch(API + '?token=' + encodeURIComponent(token))
@@ -74,6 +99,7 @@
           '<div class="card"><div class="k">Successful</div><div class="v">' + d.totals.done + '</div></div>' +
           '<div class="card"><div class="k">Failed <small>(not billed)</small></div><div class="v">' + d.totals.failed + '</div></div>' +
         '</div>' +
+        funnelHtml(d.funnel) +
         '<h2>Daily usage</h2><div class="panel">' + (d.daily.length ?
           '<div class="chart">' + d.daily.map(function (x) {
             var hD = Math.round((x.done / maxDay) * 120), hF = Math.round((x.failed / maxDay) * 120)
