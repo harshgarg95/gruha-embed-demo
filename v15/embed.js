@@ -250,10 +250,8 @@
             // both are measured -- the Howrah living room (mean 147, rendered well) and the
             // terrace (98.2, rendered badly and passed every photometric threshold we had).
             '<div class="g-ex">' +
-              '<figure><img src="https://txkxblempgconaeplqde.supabase.co/storage/v1/object/public/embed-public/guide/good_example.jpg" alt="a room photo that works">' +
-                '<figcaption class="ok">&#10003; a room, floor and wall in shot</figcaption></figure>' +
-              '<figure><img src="https://txkxblempgconaeplqde.supabase.co/storage/v1/object/public/embed-public/guide/bad_example.jpg" alt="a photo that does not work">' +
-                '<figcaption class="no">&#10007; outdoors, or no wall</figcaption></figure>' +
+              '<figure><img src="https://txkxblempgconaeplqde.supabase.co/storage/v1/object/public/embed-public/guide/good_example.jpg" alt="an example photo of where a piece would go">' +
+                '<figcaption class="ok">&#10003; the spot where it would go</figcaption></figure>' +
             '</div>' +
             '<div class="g-ask"></div>' +
           '<div class="g-drop g-off" aria-disabled="true">📷 Upload a photo of your room<br>' +
