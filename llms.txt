@@ -20,12 +20,12 @@ Several products can be placed in one room, with colour and fabric variants. Sho
 
 ## Pricing
 
-- Starter: ₹4,999 per month, 5,000 credits (about 83 renders)
-- Growth: ₹9,999 per month, 10,000 credits (about 166 renders)
-- Scale: ₹24,999 per month, 24,000 credits (about 400 renders)
-- Pro: ₹49,999 per month, 51,000 credits (about 850 renders)
-- White-label: ₹17,999 per month, 10,000 credits (about 166 renders), no Gruha badge
-- One credit is ₹1; one render is 60 credits; a failed render is free. Top-ups are prepaid packs (₹2,000 buys 1,600 credits), never expire, and are used after the monthly credits. Cancel any time. Prices exclude GST.
+- Starter: ₹4,999 per month, 4,800 credits (60 renders)
+- Growth: ₹9,999 per month, 10,400 credits (130 renders)
+- Scale: ₹24,999 per month, 28,000 credits (350 renders)
+- Pro: ₹49,999 per month, 60,000 credits (750 renders)
+- White-label: ₹17,999 per month, 10,400 credits (130 renders), no Gruha badge
+- One credit is ₹1; one render is 80 credits; a failed render is free. Top-ups are prepaid packs (₹2,000 buys 1,600 credits = 20 renders), never expire, and are used after the monthly credits. Cancel any time. Prices exclude GST.
 
 ## Main pages
 
