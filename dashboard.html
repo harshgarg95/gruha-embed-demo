@@ -43,6 +43,7 @@
   .btn{display:inline-block;background:var(--ink);color:#fff;text-decoration:none;font-weight:700;font-size:13px;padding:9px 15px;border-radius:9px}
   .err{background:#fdeceb;color:var(--bad);padding:14px 16px;border-radius:12px;font-size:14px}
   .muted{color:var(--muted);font-size:13px}
+  .sample{background:#fff4dc;color:#7a5a12;border:1px solid #f0dca8;border-radius:10px;padding:9px 13px;font-size:13px;font-weight:600;margin:0 0 18px}
   .fun{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
   @media(max-width:760px){.fun{grid-template-columns:repeat(2,1fr)}}
   .fun .card .v{font-size:22px}
@@ -61,6 +62,19 @@
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
     return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] }) }
   // 17 Nov 2026 — proof report: opened -> chose a photo -> saw it in their room -> tapped Buy.
+  var inr = function (n) { return '₹' + Math.round(n || 0).toLocaleString('en-IN') }
+  function ordersHtml (o) {
+    var head = '<h2>Orders from shoppers who saw it in their room</h2>'
+    if (!o) return head + '<div class="panel"><p class="muted">Order tracking shows here once it is switched on in the Gruha Shopify app (Settings → Order tracking).</p></div>'
+    var c = function (k, v, sub) { return '<div class="card"><div class="k">' + k + '</div><div class="v">' + v +
+      (sub ? ' <small>' + sub + '</small>' : '') + '</div></div>' }
+    return head + '<div class="cards">' +
+      c('Orders after seeing it', o.seen_orders, o.seen_share_pct != null ? o.seen_share_pct + '% of all orders' : '') +
+      c('Revenue from those orders', inr(o.seen_revenue)) +
+      c('Bought the product they saw', o.matched_orders) +
+      c('All store orders', o.total_orders, inr(o.total_revenue)) + '</div>' +
+      '<p class="muted" style="margin-top:8px">' + esc(o.note || '') + '</p>'
+  }
   function funnelHtml (f) {
     if (!f) return ''
     var c = function (k, v, sub) { return '<div class="card"><div class="k">' + k + '</div><div class="v">' + v +
@@ -76,20 +90,64 @@
       c('Shared on WhatsApp', f.shares) + '</div>' +
       (rows ? '<div class="panel" style="margin-top:12px;overflow-x:auto"><table class="ft"><tr><th>Product</th><th>Opened</th>' +
         '<th>Photo</th><th>Saw it</th><th>Buy taps</th><th>Shared</th></tr>' + rows + '</table></div>' : '') +
-      '<p class="muted" style="margin-top:8px">' + esc(f.note || '') + ' Opens and photos are counted from 16 Nov 2026.</p>'
+      '<p class="muted" style="margin-top:8px">' + esc(f.note || '') + (SAMPLE ? '' : ' Opens and photos are counted from 16 Nov 2026.') + '</p>' +
+      ordersHtml(f.orders)
   }
-  if (!token) { app.innerHTML = '<div class="err">This link is missing its token.</div>'; return }
+  // ?sample=1 — a SAMPLE dashboard for presentations. Illustrative numbers only, clearly labelled;
+  // it never calls the API and shows no real brand's data.
+  var SAMPLE = new URLSearchParams(location.search).get('sample') === '1'
+  if (!token && !SAMPLE) { app.innerHTML = '<div class="err">This link is missing its token.</div>'; return }
 
-  fetch(API + '?token=' + encodeURIComponent(token))
-    .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j } }) })
+  function sampleData () {
+    var now = new Date(), start = new Date(now.getFullYear(), now.getMonth(), 1), end = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+    // daily renders sum to the 54 shown in the cards; dates built in local time
+    var days = [], seq = [1, 3, 2, 4, 2, 5, 3, 1, 4, 6, 2, 3, 5, 2, 4, 3, 4]
+    var pad = function (n) { return (n < 10 ? '0' : '') + n }
+    for (var i = 0; i < seq.length; i++) {
+      var dt = new Date(start.getFullYear(), start.getMonth(), 1 + i)
+      days.push({ date: dt.getFullYear() + '-' + pad(dt.getMonth() + 1) + '-' + pad(dt.getDate()), done: seq[i], failed: (i === 3 || i === 10) ? 1 : 0 })
+    }
+    // name, opened, chose a photo, saw it, buy taps, shares
+    var prods = [
+      ['Distressed Floor Mirror', 88, 21, 15, 5, 3], ['Carved White Console', 70, 14, 10, 3, 2],
+      ['Blue Pedestal Side Table', 58, 11, 8, 2, 1], ['Chinoiserie Fruit Bowl', 52, 10, 8, 2, 1],
+      ['Jute Round Mirror', 41, 8, 6, 1, 1], ['Chevron Planter', 30, 5, 4, 1, 0], ['Woven Storage Basket', 22, 4, 3, 0, 1]]
+    var by = prods.map(function (p) { return { name: p[0], opened: p[1], photos: p[2], rendered: p[3], buy_clicks: p[4], shares: p[5] } })
+    var sum = function (k) { return by.reduce(function (a, r) { return a + r[k] }, 0) }
+    var saw = sum('rendered')
+    var imgs = [['g_mirror_after', 'Distressed Floor Mirror'], ['g_console_after', 'Carved White Console'],
+      ['g_table_after', 'Blue Pedestal Side Table'], ['g_bowl_after', 'Chinoiserie Fruit Bowl'], ['g_look_after', 'Bedroom look (4 pieces)']]
+    return {
+      brand: 'Your brand (sample)', period: { start: start.toISOString(), end: end.toISOString() },
+      usage: { used: saw, limit: 60, utilisation_pct: Math.round(saw / 60 * 100) },
+      totals: { done: saw, failed: 2 },
+      daily: days,
+      topProducts: by.map(function (r) { return { name: r.name, count: r.rendered } }),
+      recent: imgs.map(function (x, i) { return { product: x[1], status: 'done', at: new Date(now.getTime() - i * 5.3e6).toISOString(), thumb: 'media/renders/' + x[0] + '.jpg' } }),
+      recentHiddenNoImage: 0,
+      funnel: { opened: sum('opened'), unique_shoppers: Math.round(sum('opened') * 0.78), chose_photo: sum('photos'), saw_in_room: saw,
+        buy_clicks: sum('buy_clicks'), shares: sum('shares'), photo_rate_pct: Math.round(sum('photos') / sum('opened') * 1000) / 10,
+        buy_rate_pct: Math.round(sum('buy_clicks') / saw * 1000) / 10, by_product: by,
+        note: 'Buy taps are clicks on your Buy button from a result, not confirmed orders.',
+        orders: { total_orders: 162, total_revenue: 2148000, seen_orders: 4, seen_revenue: 71400, matched_orders: 3, currency: 'INR', seen_share_pct: 2.5,
+          note: 'Orders are reported by your store\u2019s checkout (Shopify). \u201CSaw it in their room\u201D means the shopper saw a Gruha render before checking out.' } }
+    }
+  }
+
+  var load = SAMPLE ? Promise.resolve({ ok: true, j: sampleData() })
+    : fetch(API + '?token=' + encodeURIComponent(token))
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j } }) })
+  load
     .then(function (res) {
       if (!res.ok) throw new Error(res.j.error || 'Could not load this dashboard.')
-      var d = res.j, u = d.usage, pct = u.utilisation_pct == null ? 0 : u.utilisation_pct
+      var d = res.j, u = d.usage
+      var pct = u.utilisation_pct != null ? u.utilisation_pct : (d.credits && d.credits.monthly_utilisation_pct != null ? d.credits.monthly_utilisation_pct : 0)
       var maxDay = Math.max.apply(null, d.daily.map(function (x) { return x.done + x.failed }).concat([1]))
       var maxProd = Math.max.apply(null, d.topProducts.map(function (x) { return x.count }).concat([1]))
       var fmt = function (s) { return s ? new Date(s).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : '—' }
 
       app.innerHTML =
+        (SAMPLE ? '<div class="sample">Sample dashboard · illustrative numbers, not a real brand\u2019s data</div>' : '') +
         '<h1>' + esc(d.brand) + ' — “See it in your room”</h1>' +
         '<p class="sub">Billing period ' + fmt(d.period.start) + ' → ' + fmt(d.period.end) + '</p>' +
         '<div class="cards">' +
@@ -124,8 +182,8 @@
               (r.status === 'done' ? '<span class="pill ok">rendered</span>'
                 : '<span class="pill bad">failed · not billed</span>') +
               '</div></div>' }).join('') : '<p class="muted">Nothing yet.</p>') + '</div>' +
-        '<h2>Export</h2><div class="panel"><a class="btn" href="' + API + '?format=csv&token=' +
-          encodeURIComponent(token) + '">Download CSV</a> ' +
+        '<h2>Export</h2><div class="panel"><a class="btn" href="' + (SAMPLE ? '#' : API + '?format=csv&token=' +
+          encodeURIComponent(token)) + '">Download CSV</a> ' +
           '<span class="muted" style="margin-left:10px">This period’s renders.</span></div>'
     })
     .catch(function (e) { app.innerHTML = '<div class="err">' + esc(e.message) + '</div>' })

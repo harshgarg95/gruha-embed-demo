@@ -85,6 +85,25 @@
                                page: location.pathname }) }).catch(function () {})
     } catch (e) { /* never break the widget */ }
   }
+  // 17 Nov 2026: Level 2 proof report (Shopify stores only). Marks this shopper's cart as having
+  // seen a product in their room, so the store's Gruha order pixel can count orders and revenue
+  // from these shoppers. The leading underscore keeps the attribute hidden from the shopper.
+  // Fire-and-forget: it must never affect the widget or the cart.
+  function tagCart (names) {
+    try {
+      if (!(window.Shopify && window.Shopify.shop) || !window.fetch) return
+      var seen = []
+      try { seen = JSON.parse(sessionStorage.getItem('gruha_seen') || '[]') } catch (e) {}
+      ;(names || []).forEach(function (n) { if (n && seen.indexOf(n) < 0) seen.push(String(n)) })
+      seen = seen.slice(-5)
+      try { sessionStorage.setItem('gruha_seen', JSON.stringify(seen)) } catch (e) {}
+      var root = (window.Shopify.routes && window.Shopify.routes.root) || '/'
+      fetch(root + 'cart/update.js', { method: 'POST', credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ attributes: { _gruha_seen: new Date().toISOString().slice(0, 10),
+          _gruha_products: seen.join(' | ').slice(0, 250) } }) }).catch(function () {})
+    } catch (e) { /* never break the widget */ }
+  }
   function deviceId () {
     try {
       var k = 'gruha_did', v = localStorage.getItem(k)
@@ -590,6 +609,7 @@
       var buy = $('.g-buy')
       if (product.buy_link) { buy.href = product.buy_link; buy.style.display = '' } else { buy.style.display = 'none' }
       $('.g-vars').style.display = 'none'
+      tagCart([product.name])
       show('res')
     })
   })
@@ -638,6 +658,7 @@
     var buy = $('.g-buy')
     if (j.buy_link) { buy.href = j.buy_link; buy.style.display = '' } else { buy.style.display = 'none' }
     paintVariants(shown || product)
+    tagCart([(shown && shown.name) || product.name])
     show('res')
   }
 
@@ -1121,6 +1142,7 @@
         if (a) track('buy', a.getAttribute('data-name'))
       }
       L('.l-quote').innerHTML = rows + '<div class="g-tot"><span>Total</span><span>' + money(sum) + '</span></div>'
+      tagCart(items.map(function (it) { return it.name }))
       lshow('res')
     }
 
