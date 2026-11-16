@@ -75,6 +75,16 @@
   var PRIVACY_URL = 'https://harshgarg95.github.io/gruha-embed-demo/privacy.html'
   // Stable random per-browser id, used only for the per-device daily cap. Not personal data;
   // the server stores it hashed. Clearing it is possible, which is why an IP cap backs it up.
+  // 16 Nov 2026: funnel beacon — counts button opens and photo picks (no image is sent, nothing is
+  // charged). Fire-and-forget; a failure here must never affect the shopper.
+  function track (ev) {
+    try {
+      fetch(cfg.endpoint + '?track=1', { method: 'POST', keepalive: true,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: cfg.key, event: ev, device: deviceId(), product: product && product.name,
+                               page: location.pathname }) }).catch(function () {})
+    } catch (e) { /* never break the widget */ }
+  }
   function deviceId () {
     try {
       var k = 'gruha_did', v = localStorage.getItem(k)
@@ -358,6 +368,7 @@
   function applyBrandConfig () { applyBrandConfigTo($) }
   function open() {
     ov.classList.add('open'); show('upload'); applyBrandConfig()
+    track('open')
     if (isDesktop()) $('.g-phone').style.display = 'inline-block'
   }
   function close() { ov.classList.remove('open') }
@@ -509,6 +520,7 @@
 
   fileInput.addEventListener('change', function () {
     var f = fileInput.files && fileInput.files[0]; if (!f) return
+    track('photo')
     prepPhoto(f, function (dataUrl, meta) {
       roomDataUrl = dataUrl; photoMeta = meta; roomKeyPicked = null   // a fresh upload wins
       prev.src = dataUrl; prev.style.display = 'block'
