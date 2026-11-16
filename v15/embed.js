@@ -202,6 +202,7 @@
   @keyframes gs{to{transform:rotate(360deg)}}\
   .g-res img{width:100%;border-radius:12px;display:block}\
   .g-quote{border:1px solid #eee;border-radius:12px;padding:12px 14px;margin-top:14px}\
+  .g-note{font-size:12.5px;line-height:1.45;color:#4a5351;background:#f3f6f5;border-radius:10px;padding:9px 11px;margin-top:10px}\
   .g-row{display:flex;justify-content:space-between;font-size:14px;color:#333;padding:3px 0}\
   .g-tot{display:flex;justify-content:space-between;font-weight:800;color:#1f2d2b;border-top:1px solid #eee;\
     margin-top:6px;padding-top:8px;font-size:15px}\
@@ -275,6 +276,7 @@
           '<div class="g-step g-step-load" style="display:none"><div class="g-spin"><div class="g-dot"></div><div class="g-loadmsg">Staging your room… this usually takes about a minute</div></div></div>' +
           '<div class="g-step g-step-res" style="display:none">' +
             '<div class="g-res"><img alt="your room with the product"></div>' +
+            '<div class="g-note" style="display:none"></div>' +
             '<div class="g-quote"></div>' +
             '<div class="g-vars" style="display:none"></div>' +
             '<div class="g-actions"><a class="g-buy" target="_blank" rel="noopener">Buy now</a><button class="g-wa">Share on WhatsApp</button>' +
@@ -609,6 +611,10 @@
   function renderResult(j, shown) {
     lastRenderUrl = j.renderDataUrl
     $('.g-res img').src = j.renderDataUrl
+    // 16 Nov render-and-explain: the server may attach a short note about how it placed the
+    // piece. Shown UNDER the result as a calm tip, never as an error; textContent, never HTML.
+    var noteEl = $('.g-note')
+    if (noteEl) { if (j.note) { noteEl.textContent = j.note; noteEl.style.display = '' } else { noteEl.textContent = ''; noteEl.style.display = 'none' } }
     wireDownload($('.g-dl'), j.renderDataUrl, (shown && shown.name) || product.name)
     var q = j.quote || { items: [], total_inr: product.price_inr }
     var html = ''
