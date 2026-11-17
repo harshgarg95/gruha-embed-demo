@@ -105,6 +105,7 @@ figure img{display:block;width:100%;border:1px solid var(--rule);border-radius:5
 a{color:var(--accent-ink)}
 .cta a{text-decoration:underline;text-underline-offset:3px}
 .foot{margin-top:34px;font-size:12.5px;color:var(--ink-faint);max-width:68ch}
+.cur{display:inline-flex;gap:0;border:1px solid currentColor;border-radius:999px;overflow:hidden;margin:0 0 18px;opacity:.85}.cur button{font:inherit;font-size:13px;padding:6px 14px;border:0;background:transparent;color:inherit;cursor:pointer}.cur button[aria-pressed="true"]{background:currentColor}.cur button[aria-pressed="true"]{color:#fff;background:#1f2d2b}
 </style>
 </head>
 <body>
@@ -158,47 +159,49 @@ a{color:var(--accent-ink)}
 
   <section>
     <h2>Plans</h2>
+    <div class="cur" role="group" aria-label="Currency"><button type="button" data-c="inr" aria-pressed="true">₹ INR</button><button type="button" data-c="usd" aria-pressed="false">$ USD</button></div>
     <div class="plans">
       <div class="plan">
         <div class="nm">Starter</div>
-        <div class="amt">₹4,999</div>
+        <div class="amt" data-inr="₹4,999" data-usd="$59">₹4,999</div>
         <div class="per">per month</div>
         <div class="inc"><b>4,800 credits</b>60 renders</div>
       </div>
       <div class="plan on">
         <div class="nm">Growth</div>
-        <div class="amt">₹9,999</div>
+        <div class="amt" data-inr="₹9,999" data-usd="$119">₹9,999</div>
         <div class="per">per month</div>
         <div class="inc"><b>10,400 credits</b>130 renders</div>
       </div>
       <div class="plan">
         <div class="nm">Scale</div>
-        <div class="amt">₹24,999</div>
+        <div class="amt" data-inr="₹24,999" data-usd="$279">₹24,999</div>
         <div class="per">per month</div>
         <div class="inc"><b>28,000 credits</b>350 renders</div>
       </div>
       <div class="plan">
         <div class="nm">Pro</div>
-        <div class="amt">₹49,999</div>
+        <div class="amt" data-inr="₹49,999" data-usd="$549">₹49,999</div>
         <div class="per">per month</div>
         <div class="inc"><b>60,000 credits</b>750 renders</div>
       </div>
       <div class="plan">
         <div class="nm">White-label</div>
-        <div class="amt">₹17,999</div>
+        <div class="amt" data-inr="₹17,999" data-usd="$199">₹17,999</div>
         <div class="per">per month</div>
         <div class="inc"><b>10,400 credits</b>130 renders, no Gruha badge</div>
       </div>
     </div>
 
     <div class="rate">
-      <div><div class="k">One credit</div><div class="v">₹1</div></div>
+      <div><div class="k">One credit</div><div class="v" data-inr="₹1" data-usd="≈ 1.2¢">₹1</div></div>
       <div><div class="k">One render</div><div class="v">80 credits</div></div>
       <div><div class="k">Four products in a room</div><div class="v">320 credits</div></div>
       <div><div class="k">Failed render</div><div class="v">Free</div></div>
     </div>
 
-    <p class="small">Not sure which to pick? Start on Starter — you can change plan or top up from the dashboard at any time. Top-ups are prepaid packs: <b>₹2,000 buys 1,600 credits</b> (20 renders), ₹5,000 buys 4,000 (50) and ₹10,000 buys 8,000 (100). They never expire and are only used once the monthly credits run out. If you're regularly topping up, the next plan works out cheaper. Monthly credits do not carry over. Cancel any time. Prices exclude GST.</p>
+    <p class="small" data-show="inr">Not sure which to pick? Start on Starter — you can change plan or top up from the dashboard at any time. Top-ups are prepaid packs: <b>₹2,000 buys 1,600 credits</b> (20 renders), ₹5,000 buys 4,000 (50) and ₹10,000 buys 8,000 (100). They never expire and are only used once the monthly credits run out. If you're regularly topping up, the next plan works out cheaper. Monthly credits do not carry over. Cancel any time. Prices exclude GST.</p>
+    <p class="small" data-show="usd" hidden>Outside India: the same plans and renders, billed in US dollars. Top-ups: <b>$25 buys 20 renders</b>, $60 buys 50 and $110 buys 100. They never expire and are only used once the monthly credits run out. Shopify stores can pay through their Shopify bill. Cancel any time.</p>
   </section>
 
   <section>
@@ -233,5 +236,18 @@ a{color:var(--accent-ink)}
 
   <p class="foot">Each render is generated from your catalogue photograph and the shopper's room photograph. Results vary with the room; we test on your products before anything goes live.</p>
 </div>
+<script>
+(function () {
+  // 17 Nov 2026: ₹ / $ switch. Defaults to $ for visitors outside India (by time zone); a click wins.
+  function set (c) {
+    document.querySelectorAll('[data-inr]').forEach(function (e) { e.textContent = e.getAttribute('data-' + c) })
+    document.querySelectorAll('[data-show]').forEach(function (e) { e.hidden = e.getAttribute('data-show') !== c })
+    document.querySelectorAll('.cur button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-c') === c)) })
+  }
+  document.querySelectorAll('.cur button').forEach(function (b) { b.addEventListener('click', function () { set(b.getAttribute('data-c')) }) })
+  var tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '' } catch (e) {}
+  if (tz && tz !== 'Asia/Kolkata' && tz !== 'Asia/Calcutta') set('usd')
+})()
+</script>
 </body>
 </html>

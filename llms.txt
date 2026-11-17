@@ -26,6 +26,7 @@ Several products can be placed in one room, with colour and fabric variants. Sho
 - Pro: ₹49,999 per month, 60,000 credits (750 renders)
 - White-label: ₹17,999 per month, 10,400 credits (130 renders), no Gruha badge
 - One credit is ₹1; one render is 80 credits; a failed render is free. Top-ups are prepaid packs (₹2,000 buys 1,600 credits = 20 renders), never expire, and are used after the monthly credits. Cancel any time. Prices exclude GST.
+- Outside India (billed in USD, same renders): Starter $59, Growth $119, Scale $279, Pro $549, White-label $199 per month; top-ups $25 for 20 renders, $60 for 50, $110 for 100.
 
 ## Main pages
 
