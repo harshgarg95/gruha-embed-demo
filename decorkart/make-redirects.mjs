@@ -49,7 +49,7 @@ for (const f of readdirSync(new URL('./decorkart/p/', ROOT))) {
 writeFileSync(new URL('./decorkart/index.html', ROOT), page('/demo/'))
 let n = 0
 for (const p of products) {
-  writeFileSync(new URL(`./decorkart/p/${p.handle}.html`, ROOT), page(`/demo/p/${p.handle}.html`))
+  writeFileSync(new URL(`./decorkart/p/${p.handle}.html`, ROOT), page(`/demo/p/${p.handle}`))
   n++
 }
 // The site ROOT is the landing page now, not a redirect — it is the single URL that goes in

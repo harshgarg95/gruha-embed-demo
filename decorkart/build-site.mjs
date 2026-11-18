@@ -132,7 +132,7 @@ const lookOnlyWidget = `<script src="${WIDGET}" data-gruha-key="${BRAND_KEY}"
 
 // ------------------------------------------------------------------ grid
 const cards = products.map((p) => `
-      <a class="card" href="${BASE}p/${p.handle}.html">
+      <a class="card" href="${BASE}p/${p.handle}">
         <div class="shot"><img src="${esc(sized(p.image_url, 600))}" alt="${esc(p.name)}" loading="lazy" width="600" height="600"></div>
         <div class="cat">${esc(p.category)}</div>
         <div class="nm">${esc(p.name)}</div>

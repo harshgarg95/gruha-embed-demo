@@ -14,31 +14,25 @@ cd "$(dirname "$0")"
 # compete with that retailer, so the URL, the page title and the header carry no brand name.
 # The catalogue file stays where it is and /demo builds FROM it -- two copies of a price list is
 # how a demo ends up quoting a figure the retailer no longer charges.
-echo "== demo storefront (/demo) =="
+echo "== demo storefront (/demo): ALL demo products in one place =="
+# 18 Nov 2026 (Harsh): one link for prospects. /demo now carries the furniture (seating) AND the
+# décor catalogues together; /furniture and /decorkart redirect here. Catalogue files stay where
+# they are; demo/products.json is MERGED from them (seating first), never edited by hand.
 ( cd decorkart && node build-catalog.mjs )
-SITE_DIR=demo SITE_PRODUCTS=decorkart/products.json \
+( cd furniture && node build-catalog.mjs )
+node scripts/merge-demo-catalogue.mjs
+SITE_DIR=demo SITE_PRODUCTS=demo/products.json \
   SITE_BASE=/demo/ \
   SITE_BRAND="THE DEMO STORE" \
   SITE_TITLE="The Demo Store" \
-  SITE_SOURCE="a live Indian décor catalogue" \
+  SITE_SOURCE="live Indian furniture and décor catalogues" \
+  SITE_NAV="Sofas,Furniture,Lighting,Décor,Mirrors" \
   node decorkart/build-site.mjs
 
 echo
-echo "== redirects for the retired /decorkart paths =="
+echo "== redirects: /decorkart and /furniture -> /demo =="
 node decorkart/make-redirects.mjs
-
-echo
-echo "== Orange Tree seating (/furniture) =="
-# Decor Kart sell no seating at all, so the sofa/armchair demo lives on its own storefront rather
-# than putting a rival brand's sofa on a page headed THE DÉCOR KART.
-( cd furniture && node build-catalog.mjs )
-cd decorkart && SITE_DIR=furniture \
-  SITE_BASE=/furniture/ \
-  SITE_BRAND="ORANGE TREE" \
-  SITE_SHOP=orangetree.in \
-  SITE_NAV="Sofas,Armchairs" \
-  SITE_INTRO="Large upholstered furniture is the hardest thing to judge from a white background — and the case this works best on. These are real Orange Tree pieces; <b>The Décor Kart do not sell seating</b>, which is why this sits on its own page rather than in their store." \
-  node build-site.mjs
+node scripts/make-furniture-redirects.mjs
 
 echo
 echo "done. Widget version is set in decorkart/build-site.mjs (WIDGET)."
